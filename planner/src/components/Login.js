@@ -1,89 +1,193 @@
-import React, { useState } from 'react';
+import * as React from 'react';
+import Box from '@mui/material/Box';
+import Button from '@mui/material/Button';
+import CssBaseline from '@mui/material/CssBaseline';
+import Divider from '@mui/material/Divider';
+import FormLabel from '@mui/material/FormLabel';
+import FormControl from '@mui/material/FormControl';
+import Link from '@mui/material/Link';
+import TextField from '@mui/material/TextField';
+import Typography from '@mui/material/Typography';
+import Stack from '@mui/material/Stack';
+import MuiCard from '@mui/material/Card';
+import { styled } from '@mui/material/styles';
 import { login } from '../services/auth';
-import { TextField, Container, Button, Typography, Paper, Box, CircularProgress } from '@mui/material';
-import { Email, Lock } from '@mui/icons-material'; // Ícones para os campos
 
-const Login = ({ onLogin }) => {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [error, setError] = useState('');
-  const [loading, setLoading] = useState(false); // Estado para o ícone de carregamento
+const Card = styled(MuiCard)(({ theme }) => ({
+  display: 'flex',
+  flexDirection: 'column',
+  alignSelf: 'center',
+  width: '100%',
+  padding: theme.spacing(4),
+  gap: theme.spacing(2),
+  margin: 'auto',
+  [theme.breakpoints.up('sm')]: {
+    maxWidth: '450px',
+  },
+  boxShadow:
+    'hsla(225, 30.80%, 5.10%, 0.05) 0px 5px 15px 0px,hsl(222, 25.50%, 10.00%) 0px 15px 35px -5px',
+  ...theme.applyStyles('dark', {
+    boxShadow:
+      'hsla(220, 30%, 5%, 0.5) 0px 5px 15px 0px,hsl(222, 25.50%, 10.00%) 0px 15px 35px -5px',
+  }),
+}));
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setLoading(true); // Ativa o ícone de carregamento
-    setError(''); // Limpa erros anteriores
+const SignInContainer = styled(Stack)(({ theme }) => ({
+  height: 'calc((1 - var(--template-frame-height, 0)) * 100dvh)',
+  minHeight: '100%',
+  padding: theme.spacing(2),
+  [theme.breakpoints.up('sm')]: {
+    padding: theme.spacing(4),
+  },
+  '&::before': {
+    content: '""',
+    display: 'block',
+    position: 'absolute',
+    zIndex: -1,
+    inset: 0,
+    backgroundImage:
+      'radial-gradient(ellipse at 50% 50%,hsl(210, 100.00%, 16.10%),hsl(225, 30.80%, 5.10%))',
+    backgroundRepeat: 'no-repeat',
+    ...theme.applyStyles('dark', {
+      backgroundImage:
+        'radial-gradient(at 50% 50%,hsl(210, 100.00%, 16.10%),hsl(225, 30.80%, 5.10%))',
+    }),
+  },
+}));
+
+export default function SignIn(props) {
+  const [emailError, setEmailError] = React.useState(false);
+  const [emailErrorMessage, setEmailErrorMessage] = React.useState('');
+  const [passwordError, setPasswordError] = React.useState(false);
+  const [passwordErrorMessage, setPasswordErrorMessage] = React.useState('');
+
+  const handleSubmit = async (event) => {
+    event.preventDefault();
+    if (!validateInputs()) {
+      return;
+    }
+    const data = new FormData(event.currentTarget);
+    const email = data.get('email');
+    const password = data.get('password');
 
     try {
-      await login(email, password);
-      onLogin();
-    } catch (err) {
-      setError('Credenciais inválidas');
-    } finally {
-      setLoading(false); // Desativa o ícone de carregamento
+      await login(email, password); // Chamada à função de autenticação
+      console.log('Login successful');
+      // Redirecionar ou realizar outras ações após o login bem-sucedido
+    } catch (error) {
+      console.error('Login failed', error);
+      // Exibir mensagem de erro para o usuário
     }
   };
 
-  // Validação básica do email
-  const isEmailValid = () => {
-    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+  const validateInputs = () => {
+    const email = document.getElementById('email');
+    const password = document.getElementById('password');
+
+    let isValid = true;
+
+    if (!email.value || !/\S+@\S+\.\S+/.test(email.value)) {
+      setEmailError(true);
+      setEmailErrorMessage('Insira um endereço de e-mail válido.');
+      isValid = false;
+    } else {
+      setEmailError(false);
+      setEmailErrorMessage('');
+    }
+
+    if (!password.value || password.value.length < 6) {
+      setPasswordError(true);
+      setPasswordErrorMessage('A senha deve ter pelo menos 6 caracteres.');
+      isValid = false;
+    } else {
+      setPasswordError(false);
+      setPasswordErrorMessage('');
+    }
+
+    return isValid;
   };
 
   return (
-    <Container component="main" maxWidth="xs">
-      <Paper elevation={3} sx={{ mt: 8, p: 4, display: 'flex', flexDirection: 'column', alignItems: 'center', backgroundColor: 'background.paper' }}>
-        <Typography component="h1" variant="h5" sx={{ mb: 2 }}>
-          Login
-        </Typography>
-        <Box component="form" onSubmit={handleSubmit} sx={{ width: '100%' }}>
-          {/* Campo de Email */}
-          <TextField
-            fullWidth
-            margin="normal"
-            id="email"
-            label="Email"
-            type="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            error={!!email && !isEmailValid()} // Mostra erro se o email for inválido
-            helperText={!!email && !isEmailValid() ? 'Email inválido' : ''}
-            InputProps={{
-              startAdornment: <Email sx={{ color: 'action.active', mr: 1 }} />, // Ícone de email
-            }}
-          />
-          {/* Campo de Senha */}
-          <TextField
-            fullWidth
-            margin="normal"
-            id="password"
-            label="Senha"
-            type="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            InputProps={{
-              startAdornment: <Lock sx={{ color: 'action.active', mr: 1 }} />, // Ícone de senha
-            }}
-          />
-          {/* Exibição de Erro */}
-          {error && (
-            <Typography color="error" variant="body2" sx={{ mt: 1 }}>
-              {error}
-            </Typography>
-          )}
-          {/* Botão de Login */}
-          <Button
-            type="submit"
-            fullWidth
-            variant="contained"
-            disabled={loading || !isEmailValid() || !password} // Desabilita o botão se estiver carregando ou os campos forem inválidos
-            sx={{ mt: 3, mb: 2, bgcolor: 'primary.main', '&:hover': { bgcolor: 'primary.dark' } }}
+    <>
+      <CssBaseline enableColorScheme />
+      <SignInContainer direction="column" justifyContent="space-between">
+        <Card variant="outlined">
+          <Typography
+            component="h1"
+            variant="h4"
+            sx={{ width: '100%', fontSize: 'clamp(2rem, 10vw, 2.15rem)' }}
           >
-            {loading ? <CircularProgress size={24} /> : 'Entrar'} {/* Ícone de carregamento */}
-          </Button>
-        </Box>
-      </Paper>
-    </Container>
+            Entrar
+          </Typography>
+          <Box
+            component="form"
+            onSubmit={handleSubmit}
+            noValidate
+            sx={{
+              display: 'flex',
+              flexDirection: 'column',
+              width: '100%',
+              gap: 2,
+            }}
+          >
+            <FormControl>
+              <FormLabel htmlFor="email">Email</FormLabel>
+              <TextField
+                error={emailError}
+                helperText={emailErrorMessage}
+                id="email"
+                type="email"
+                name="email"
+                placeholder="seu@email.com"
+                autoComplete="email"
+                autoFocus
+                required
+                fullWidth
+                variant="outlined"
+                color={emailError ? 'error' : 'primary'}
+              />
+            </FormControl>
+            <FormControl>
+              <FormLabel htmlFor="password">Senha</FormLabel>
+              <TextField
+                error={passwordError}
+                helperText={passwordErrorMessage}
+                name="password"
+                placeholder="••••••"
+                type="password"
+                id="password"
+                autoComplete="current-password"
+                autoFocus
+                required
+                fullWidth
+                variant="outlined"
+                color={passwordError ? 'error' : 'primary'}
+              />
+            </FormControl>
+            <Button
+              type="submit"
+              fullWidth
+              variant="contained"
+              onClick={validateInputs}
+            >
+              Entre
+            </Button>
+          </Box>
+          <Divider>ou</Divider>
+          <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+            <Typography sx={{ textAlign: 'center' }}>
+            Não tem uma conta?{' '}
+              <Link
+                href="/signUp"
+                variant="body2"
+                sx={{ alignSelf: 'center' }}
+              >
+                Cadastre-se
+              </Link>
+            </Typography>
+          </Box>
+        </Card>
+      </SignInContainer>
+    </>
   );
-};
-
-export default Login;
+}
