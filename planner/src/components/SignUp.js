@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import { login } from '../services/auth';
 import {
   TextField,
   Container,
@@ -13,7 +12,7 @@ import {
   CssBaseline,
   Link,
 } from '@mui/material';
-import { Email, Lock } from '@mui/icons-material';
+import { Email, Lock, Person } from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
 
 // Tema escuro personalizado
@@ -34,9 +33,11 @@ const darkTheme = createTheme({
   },
 });
 
-const Login = ({ onLogin }) => {
+const SignUp = () => {
+  const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
@@ -46,22 +47,37 @@ const Login = ({ onLogin }) => {
     setLoading(true);
     setError('');
 
+    if (!name || !email || !password || !confirmPassword) {
+      setError('Todos os campos são obrigatórios.');
+      setLoading(false);
+      return;
+    }
+
+    if (password !== confirmPassword) {
+      setError('As senhas não coincidem.');
+      setLoading(false);
+      return;
+    }
+
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      setError('Insira um email válido.');
+      setLoading(false);
+      return;
+    }
+
     try {
-      await login(email, password);
-      onLogin();
+      // Simulação de cadastro
+      console.log('Cadastro realizado:', { name, email, password });
+      navigate('/login');
     } catch (err) {
-      setError('Credenciais inválidas');
+      setError('Erro ao cadastrar. Tente novamente.');
     } finally {
       setLoading(false);
     }
   };
 
-  const isEmailValid = () => {
-    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
-  };
-
-  const handleRedirectToSignUp = () => {
-    navigate('/signup');
+  const handleRedirectToLogin = () => {
+    navigate('/login');
   };
 
   return (
@@ -92,9 +108,23 @@ const Login = ({ onLogin }) => {
             }}
           >
             <Typography component="h1" variant="h5" sx={{ mb: 2 }}>
-              Entre
+              Cadastre-se
             </Typography>
             <Box component="form" onSubmit={handleSubmit} sx={{ width: '100%' }}>
+              {/* Campo de Nome */}
+              <TextField
+                fullWidth
+                margin="normal"
+                id="name"
+                label="Nome"
+                type="text"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                InputProps={{
+                  startAdornment: <Person sx={{ color: 'action.active', mr: 1 }} />,
+                }}
+                sx={{ background: 'rgba(255, 255, 255, 0.1)', borderRadius: '5px' }} // Fundo sutil
+              />
               {/* Campo de Email */}
               <TextField
                 fullWidth
@@ -104,8 +134,8 @@ const Login = ({ onLogin }) => {
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                error={!!email && !isEmailValid()}
-                helperText={!!email && !isEmailValid() ? 'Email inválido' : ''}
+                error={!!email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)}
+                helperText={!!email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) ? 'Email inválido' : ''}
                 InputProps={{
                   startAdornment: <Email sx={{ color: 'action.active', mr: 1 }} />,
                 }}
@@ -125,18 +155,32 @@ const Login = ({ onLogin }) => {
                 }}
                 sx={{ background: 'rgba(255, 255, 255, 0.1)', borderRadius: '5px' }} // Fundo sutil
               />
+              {/* Campo de Confirmação de Senha */}
+              <TextField
+                fullWidth
+                margin="normal"
+                id="confirmPassword"
+                label="Confirme a Senha"
+                type="password"
+                value={confirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value)}
+                InputProps={{
+                  startAdornment: <Lock sx={{ color: 'action.active', mr: 1 }} />,
+                }}
+                sx={{ background: 'rgba(255, 255, 255, 0.1)', borderRadius: '5px' }} // Fundo sutil
+              />
               {/* Exibição de Erro */}
               {error && (
                 <Typography color="error" variant="body2" sx={{ mt: 1 }}>
                   {error}
                 </Typography>
               )}
-              {/* Botão de Login */}
+              {/* Botão de Cadastro */}
               <Button
                 type="submit"
                 fullWidth
                 variant="contained"
-                disabled={loading || !isEmailValid() || !password}
+                disabled={loading}
                 sx={{
                   mt: 3,
                   mb: 2,
@@ -148,19 +192,19 @@ const Login = ({ onLogin }) => {
                   },
                 }}
               >
-                {loading ? <CircularProgress size={24} /> : 'Entrar'}
+                {loading ? <CircularProgress size={24} /> : 'Cadastrar'}
               </Button>
             </Box>
-            {/* Link para a tela de cadastro */}
+            {/* Link para a tela de login */}
             <Typography variant="body2" sx={{ mt: 2 }}>
-              Não tem uma conta?{' '}
+              Já tem uma conta?{' '}
               <Link
                 component="button"
                 variant="body2"
-                onClick={handleRedirectToSignUp}
+                onClick={handleRedirectToLogin}
                 sx={{ color: 'primary.main', textDecoration: 'none', '&:hover': { textDecoration: 'underline' } }}
               >
-                Cadastre-se
+                Entrar
               </Link>
             </Typography>
           </Paper>
@@ -170,4 +214,4 @@ const Login = ({ onLogin }) => {
   );
 };
 
-export default Login;
+export default SignUp;
