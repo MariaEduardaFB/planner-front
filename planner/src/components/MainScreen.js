@@ -1,28 +1,23 @@
-import React, { useEffect, useState } from 'react';
-import { Outlet } from 'react-router-dom';
-import { jwtDecode } from 'jwt-decode';
+import React, { useEffect } from 'react';
+import { Outlet, useNavigate } from 'react-router-dom';
 import Menu from './Menu';
 
 const MainScreen = () => {
-  const [userRole, setUserRole] = useState(null);
+  const navigate = useNavigate();
 
   useEffect(() => {
+    // Verifica se o usuário está autenticado
     const token = localStorage.getItem('token');
-    if (token) {
-      try {
-        const decoded = jwtDecode(token);
-        setUserRole(decoded.role);
-      } catch (error) {
-        console.error('Erro ao decodificar token:', error);
-        localStorage.removeItem('token');
-      }
+    if (!token) {
+      // Se não houver token, redireciona para a tela de login
+      navigate('/login');
     }
-  }, []);
+  }, [navigate]);
 
   return (
     <div>
-      <Menu userRole={userRole} />
-      <Outlet context={{ userRole }} /> {/* Passa o userRole para as rotas filhas */}
+      <Menu /> {/* Menu sem a necessidade de userRole */}
+      <Outlet /> {/* Rotas filhas */}
     </div>
   );
 };
