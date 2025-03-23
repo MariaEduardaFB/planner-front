@@ -5,9 +5,18 @@ body {
     sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  height: 100%; /* Garante que o HTML e o body ocupem toda a altura */
+  margin: 0; /* Remove margens padrão */
+  padding: 0;
+
 }
 
 code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
+}
+
+
+#root {
+  height: 100%; /* Garante que o React ocupe toda a altura */
 }

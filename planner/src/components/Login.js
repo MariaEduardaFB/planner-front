@@ -3,6 +3,7 @@ import { login } from '../services/auth';
 import { TextField, Container, Button, Typography, Paper, Box, CircularProgress } from '@mui/material';
 import { Email, Lock } from '@mui/icons-material'; // Ícones para os campos
 
+
 const Login = ({ onLogin }) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -30,8 +31,18 @@ const Login = ({ onLogin }) => {
   };
 
   return (
-    <Container component="main" maxWidth="xs">
-      <Paper elevation={3} sx={{ mt: 8, p: 4, display: 'flex', flexDirection: 'column', alignItems: 'center', backgroundColor: 'background.paper' }}>
+    <Container
+    component="main"
+    maxWidth="xs"
+    sx={{
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      minHeight: '100vh', // Centraliza verticalmente
+      backgroundColor: '#f0f0f0', // Cor de fundo da tela
+    }}
+  >
+      <Paper elevation={3} sx={{ mt: 8, p: 4, display: 'flex', flexDirection: 'column', alignItems: 'center', backgroundColor: '#90caf9' }}>
         <Typography component="h1" variant="h5" sx={{ mb: 2 }}>
           Login
         </Typography>
