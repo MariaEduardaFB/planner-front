@@ -1,193 +1,173 @@
-import * as React from 'react';
-import Box from '@mui/material/Box';
-import Button from '@mui/material/Button';
-import CssBaseline from '@mui/material/CssBaseline';
-import Divider from '@mui/material/Divider';
-import FormLabel from '@mui/material/FormLabel';
-import FormControl from '@mui/material/FormControl';
-import Link from '@mui/material/Link';
-import TextField from '@mui/material/TextField';
-import Typography from '@mui/material/Typography';
-import Stack from '@mui/material/Stack';
-import MuiCard from '@mui/material/Card';
-import { styled } from '@mui/material/styles';
+import React, { useState } from 'react';
 import { login } from '../services/auth';
+import {
+  TextField,
+  Container,
+  Button,
+  Typography,
+  Paper,
+  Box,
+  CircularProgress,
+  ThemeProvider,
+  createTheme,
+  CssBaseline,
+  Link,
+} from '@mui/material';
+import { Email, Lock } from '@mui/icons-material';
+import { useNavigate } from 'react-router-dom';
 
-const Card = styled(MuiCard)(({ theme }) => ({
-  display: 'flex',
-  flexDirection: 'column',
-  alignSelf: 'center',
-  width: '100%',
-  padding: theme.spacing(4),
-  gap: theme.spacing(2),
-  margin: 'auto',
-  [theme.breakpoints.up('sm')]: {
-    maxWidth: '450px',
+// Tema escuro personalizado
+const darkTheme = createTheme({
+  palette: {
+    mode: 'dark',
+    primary: {
+      main: '#90caf9', // Azul claro
+    },
+    background: {
+      default: '#121212', // Fundo escuro
+      paper: 'rgba(30, 30, 30, 0.8)', // Transparência no cartão
+    },
+    text: {
+      primary: '#ffffff', // Texto branco
+      secondary: '#b3b3b3', // Texto cinza
+    },
   },
-  boxShadow:
-    'hsla(225, 30.80%, 5.10%, 0.05) 0px 5px 15px 0px,hsl(222, 25.50%, 10.00%) 0px 15px 35px -5px',
-  ...theme.applyStyles('dark', {
-    boxShadow:
-      'hsla(220, 30%, 5%, 0.5) 0px 5px 15px 0px,hsl(222, 25.50%, 10.00%) 0px 15px 35px -5px',
-  }),
-}));
+});
 
-const SignInContainer = styled(Stack)(({ theme }) => ({
-  height: 'calc((1 - var(--template-frame-height, 0)) * 100dvh)',
-  minHeight: '100%',
-  padding: theme.spacing(2),
-  [theme.breakpoints.up('sm')]: {
-    padding: theme.spacing(4),
-  },
-  '&::before': {
-    content: '""',
-    display: 'block',
-    position: 'absolute',
-    zIndex: -1,
-    inset: 0,
-    backgroundImage:
-      'radial-gradient(ellipse at 50% 50%,hsl(210, 100.00%, 16.10%),hsl(225, 30.80%, 5.10%))',
-    backgroundRepeat: 'no-repeat',
-    ...theme.applyStyles('dark', {
-      backgroundImage:
-        'radial-gradient(at 50% 50%,hsl(210, 100.00%, 16.10%),hsl(225, 30.80%, 5.10%))',
-    }),
-  },
-}));
+const Login = ({ onLogin }) => {
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
 
-export default function SignIn(props) {
-  const [emailError, setEmailError] = React.useState(false);
-  const [emailErrorMessage, setEmailErrorMessage] = React.useState('');
-  const [passwordError, setPasswordError] = React.useState(false);
-  const [passwordErrorMessage, setPasswordErrorMessage] = React.useState('');
-
-  const handleSubmit = async (event) => {
-    event.preventDefault();
-    if (!validateInputs()) {
-      return;
-    }
-    const data = new FormData(event.currentTarget);
-    const email = data.get('email');
-    const password = data.get('password');
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+    setError('');
 
     try {
-      await login(email, password); // Chamada à função de autenticação
-      console.log('Login successful');
-      // Redirecionar ou realizar outras ações após o login bem-sucedido
-    } catch (error) {
-      console.error('Login failed', error);
-      // Exibir mensagem de erro para o usuário
+      await login(email, password);
+      onLogin();
+    } catch (err) {
+      setError('Credenciais inválidas');
+    } finally {
+      setLoading(false);
     }
   };
 
-  const validateInputs = () => {
-    const email = document.getElementById('email');
-    const password = document.getElementById('password');
+  const isEmailValid = () => {
+    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+  };
 
-    let isValid = true;
-
-    if (!email.value || !/\S+@\S+\.\S+/.test(email.value)) {
-      setEmailError(true);
-      setEmailErrorMessage('Insira um endereço de e-mail válido.');
-      isValid = false;
-    } else {
-      setEmailError(false);
-      setEmailErrorMessage('');
-    }
-
-    if (!password.value || password.value.length < 6) {
-      setPasswordError(true);
-      setPasswordErrorMessage('A senha deve ter pelo menos 6 caracteres.');
-      isValid = false;
-    } else {
-      setPasswordError(false);
-      setPasswordErrorMessage('');
-    }
-
-    return isValid;
+  const handleRedirectToSignUp = () => {
+    navigate('/signup');
   };
 
   return (
-    <>
-      <CssBaseline enableColorScheme />
-      <SignInContainer direction="column" justifyContent="space-between">
-        <Card variant="outlined">
-          <Typography
-            component="h1"
-            variant="h4"
-            sx={{ width: '100%', fontSize: 'clamp(2rem, 10vw, 2.15rem)' }}
-          >
-            Entrar
-          </Typography>
-          <Box
-            component="form"
-            onSubmit={handleSubmit}
-            noValidate
+    <ThemeProvider theme={darkTheme}>
+      <CssBaseline />
+      <Box
+        sx={{
+          minHeight: '100vh',
+          background: 'linear-gradient(135deg, #000000 0%, #0a192f 100%)', // Gradiente preto para azul escuro
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+        }}
+      >
+        <Container component="main" maxWidth="xs">
+          <Paper
+            elevation={3}
             sx={{
+              p: 4,
               display: 'flex',
               flexDirection: 'column',
-              width: '100%',
-              gap: 2,
+              alignItems: 'center',
+              background: 'rgba(30, 30, 30, 0.8)', // Efeito de vidro
+              backdropFilter: 'blur(10px)', // Desfoque
+              borderRadius: '15px', // Bordas arredondadas
+              boxShadow: '0 8px 32px 0 rgba(31, 38, 135, 0.37)', // Sombra suave
+              border: '1px solid rgba(255, 255, 255, 0.18)', // Borda sutil
             }}
           >
-            <FormControl>
-              <FormLabel htmlFor="email">Email</FormLabel>
+            <Typography component="h1" variant="h5" sx={{ mb: 2 }}>
+              Login
+            </Typography>
+            <Box component="form" onSubmit={handleSubmit} sx={{ width: '100%' }}>
+              {/* Campo de Email */}
               <TextField
-                error={emailError}
-                helperText={emailErrorMessage}
+                fullWidth
+                margin="normal"
                 id="email"
+                label="Email"
                 type="email"
-                name="email"
-                placeholder="seu@email.com"
-                autoComplete="email"
-                autoFocus
-                required
-                fullWidth
-                variant="outlined"
-                color={emailError ? 'error' : 'primary'}
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                error={!!email && !isEmailValid()}
+                helperText={!!email && !isEmailValid() ? 'Email inválido' : ''}
+                InputProps={{
+                  startAdornment: <Email sx={{ color: 'action.active', mr: 1 }} />,
+                }}
+                sx={{ background: 'rgba(255, 255, 255, 0.1)', borderRadius: '5px' }} // Fundo sutil
               />
-            </FormControl>
-            <FormControl>
-              <FormLabel htmlFor="password">Senha</FormLabel>
+              {/* Campo de Senha */}
               <TextField
-                error={passwordError}
-                helperText={passwordErrorMessage}
-                name="password"
-                placeholder="••••••"
-                type="password"
-                id="password"
-                autoComplete="current-password"
-                autoFocus
-                required
                 fullWidth
-                variant="outlined"
-                color={passwordError ? 'error' : 'primary'}
+                margin="normal"
+                id="password"
+                label="Senha"
+                type="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                InputProps={{
+                  startAdornment: <Lock sx={{ color: 'action.active', mr: 1 }} />,
+                }}
+                sx={{ background: 'rgba(255, 255, 255, 0.1)', borderRadius: '5px' }} // Fundo sutil
               />
-            </FormControl>
-            <Button
-              type="submit"
-              fullWidth
-              variant="contained"
-              onClick={validateInputs}
-            >
-              Entre
-            </Button>
-          </Box>
-          <Divider>ou</Divider>
-          <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-            <Typography sx={{ textAlign: 'center' }}>
-            Não tem uma conta?{' '}
+              {/* Exibição de Erro */}
+              {error && (
+                <Typography color="error" variant="body2" sx={{ mt: 1 }}>
+                  {error}
+                </Typography>
+              )}
+              {/* Botão de Login */}
+              <Button
+                type="submit"
+                fullWidth
+                variant="contained"
+                disabled={loading || !isEmailValid() || !password}
+                sx={{
+                  mt: 3,
+                  mb: 2,
+                  background: 'linear-gradient(135deg, #0a192f 0%, #2575fc 100%)', // Gradiente no botão
+                  color: 'white',
+                  borderRadius: '8px', // Bordas arredondadas
+                  '&:hover': {
+                    background: 'linear-gradient(135deg, #2575fc 0%, #0a192f 100%)', // Gradiente invertido ao passar o mouse
+                  },
+                }}
+              >
+                {loading ? <CircularProgress size={24} /> : 'Entrar'}
+              </Button>
+            </Box>
+            {/* Link para a tela de cadastro */}
+            <Typography variant="body2" sx={{ mt: 2 }}>
+              Não tem uma conta?{' '}
               <Link
-                href="/signUp"
+                component="button"
                 variant="body2"
-                sx={{ alignSelf: 'center' }}
+                onClick={handleRedirectToSignUp}
+                sx={{ color: 'primary.main', textDecoration: 'none', '&:hover': { textDecoration: 'underline' } }}
               >
                 Cadastre-se
               </Link>
             </Typography>
-          </Box>
-        </Card>
-      </SignInContainer>
-    </>
+          </Paper>
+        </Container>
+      </Box>
+    </ThemeProvider>
   );
-}
+};
+
+export default Login;
