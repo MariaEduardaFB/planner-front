@@ -25,7 +25,7 @@ const darkTheme = createTheme({
     },
     background: {
       default: '#121212', // Fundo escuro
-      paper: 'rgba(30, 30, 30, 0.8)', // Transparência no cartão
+      paper: 'rgba(30, 30, 30, 0.5)', // Transparência no cartão
     },
     text: {
       primary: '#ffffff', // Texto branco
@@ -84,15 +84,15 @@ const Login = ({ onLogin }) => {
               display: 'flex',
               flexDirection: 'column',
               alignItems: 'center',
-              background: 'rgba(30, 30, 30, 0.8)', // Efeito de vidro
-              backdropFilter: 'blur(10px)', // Desfoque
+              background: 'rgba(30, 30, 30, 0.5)', // Fundo semi-transparente
+              backdropFilter: 'blur(10px)', // Efeito de desfoque
               borderRadius: '15px', // Bordas arredondadas
               boxShadow: '0 8px 32px 0 rgba(31, 38, 135, 0.37)', // Sombra suave
               border: '1px solid rgba(255, 255, 255, 0.18)', // Borda sutil
             }}
           >
             <Typography component="h1" variant="h5" sx={{ mb: 2 }}>
-              Login
+              Entre
             </Typography>
             <Box component="form" onSubmit={handleSubmit} sx={{ width: '100%' }}>
               {/* Campo de Email */}
