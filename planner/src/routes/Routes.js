@@ -1,8 +1,8 @@
 import React from 'react';
 import { BrowserRouter, Route, Routes, Navigate } from 'react-router-dom';
 import Login from '../components/Login';
+import SignUp from '../components/SignUp'; // Importe o componente de cadastro
 import MainScreen from '../components/MainScreen';
-
 
 const Layout = ({ children, setAuthenticated }) => {
   const handleLogout = () => {
@@ -39,6 +39,12 @@ const AppRoutes = ({ isAuthenticated, setAuthenticated }) => {
           element={!isAuthenticated ? <Login onLogin={handleLogin} /> : <Navigate to="/" />}
         />
 
+        {/* Rota de Cadastro */}
+        <Route
+          path="/signup"
+          element={!isAuthenticated ? <SignUp /> : <Navigate to="/" />}
+        />
+
         {/* Rotas autenticadas com Layout */}
         <Route
           path="/"
@@ -53,7 +59,6 @@ const AppRoutes = ({ isAuthenticated, setAuthenticated }) => {
           }
         >
           {/* As rotas como /users, /categories, etc., estão aninhadas dentro da rota raiz / no MainScreen, usando o Outlet para renderizar o conteúdo. */}
-          
         </Route>
 
         {/* Rotas inválidas redirecionam para / (se autenticado) ou /login (se não autenticado). */}
