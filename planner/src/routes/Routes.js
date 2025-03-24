@@ -1,26 +1,40 @@
 import React from 'react';
 import { BrowserRouter, Route, Routes, Navigate } from 'react-router-dom';
 import Login from '../components/Login';
-import SignUp from '../components/SignUp'; // Importe o componente de cadastro
+import SignUp from '../components/SignUp';
 import MainScreen from '../components/MainScreen';
+import { IoMdExit } from 'react-icons/io';
 
 const Layout = ({ children, setAuthenticated }) => {
   const handleLogout = () => {
-    localStorage.removeItem('token'); // Remove o token
+    localStorage.removeItem('token');
     setAuthenticated(false);
   };
 
   return (
     <div>
-      <header style={{ display: 'flex', justifyContent: 'space-between', padding: '10px', backgroundColor: '#f8f8f8' }}>
-        <h1>Bem-vindo ao Sistema</h1>
-        <button onClick={handleLogout} style={{ padding: '5px 10px' }}>
-          Sair
-        </button>
-      </header>
-      <main style={{ padding: '20px' }}>
-        {children}
-      </main>
+      <button
+        onClick={handleLogout}
+        style={{
+          border: 'none',
+          background: 'none',
+          fontSize: '1.2rem',
+          cursor: 'pointer',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          gap: '0.2rem',
+          color: '#fff',
+          bottom: '1rem',
+          left: '1rem',
+          position: 'absolute',
+          zIndex: 1000,
+        }}
+      >
+        Sair
+        <IoMdExit />
+      </button>
+      <main>{children}</main>
     </div>
   );
 };
@@ -33,19 +47,22 @@ const AppRoutes = ({ isAuthenticated, setAuthenticated }) => {
   return (
     <BrowserRouter>
       <Routes>
-        {/* Rota de Login */}
         <Route
           path="/login"
-          element={!isAuthenticated ? <Login onLogin={handleLogin} /> : <Navigate to="/" />}
+          element={
+            !isAuthenticated ? (
+              <Login onLogin={handleLogin} />
+            ) : (
+              <Navigate to="/" />
+            )
+          }
         />
 
-        {/* Rota de Cadastro */}
         <Route
           path="/signup"
           element={!isAuthenticated ? <SignUp /> : <Navigate to="/" />}
         />
 
-        {/* Rotas autenticadas com Layout */}
         <Route
           path="/"
           element={
@@ -62,7 +79,10 @@ const AppRoutes = ({ isAuthenticated, setAuthenticated }) => {
         </Route>
 
         {/* Rotas inválidas redirecionam para / (se autenticado) ou /login (se não autenticado). */}
-        <Route path="*" element={<Navigate to={isAuthenticated ? "/" : "/login"} />} />
+        <Route
+          path="*"
+          element={<Navigate to={isAuthenticated ? '/' : '/login'} />}
+        />
       </Routes>
     </BrowserRouter>
   );

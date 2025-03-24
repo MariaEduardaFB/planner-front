@@ -107,10 +107,22 @@ const SignUp = () => {
               border: '1px solid rgba(255, 255, 255, 0.18)', // Borda sutil
             }}
           >
+            <img
+              src="/logo.svg"
+              alt=""
+              style={{
+                width: '300px',
+                zIndex: -1,
+              }}
+            />
             <Typography component="h1" variant="h5" sx={{ mb: 2 }}>
               Cadastre-se
             </Typography>
-            <Box component="form" onSubmit={handleSubmit} sx={{ width: '100%' }}>
+            <Box
+              component="form"
+              onSubmit={handleSubmit}
+              sx={{ width: '100%' }}
+            >
               {/* Campo de Nome */}
               <TextField
                 fullWidth
@@ -121,9 +133,14 @@ const SignUp = () => {
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 InputProps={{
-                  startAdornment: <Person sx={{ color: 'action.active', mr: 1 }} />,
+                  startAdornment: (
+                    <Person sx={{ color: 'action.active', mr: 1 }} />
+                  ),
                 }}
-                sx={{ background: 'rgba(255, 255, 255, 0.1)', borderRadius: '5px' }} // Fundo sutil
+                sx={{
+                  background: 'rgba(255, 255, 255, 0.1)',
+                  borderRadius: '5px',
+                }} // Fundo sutil
               />
               {/* Campo de Email */}
               <TextField
@@ -135,11 +152,20 @@ const SignUp = () => {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 error={!!email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)}
-                helperText={!!email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) ? 'Email inválido' : ''}
+                helperText={
+                  !!email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)
+                    ? 'Email inválido'
+                    : ''
+                }
                 InputProps={{
-                  startAdornment: <Email sx={{ color: 'action.active', mr: 1 }} />,
+                  startAdornment: (
+                    <Email sx={{ color: 'action.active', mr: 1 }} />
+                  ),
                 }}
-                sx={{ background: 'rgba(255, 255, 255, 0.1)', borderRadius: '5px' }} // Fundo sutil
+                sx={{
+                  background: 'rgba(255, 255, 255, 0.1)',
+                  borderRadius: '5px',
+                }} // Fundo sutil
               />
               {/* Campo de Senha */}
               <TextField
@@ -151,9 +177,14 @@ const SignUp = () => {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 InputProps={{
-                  startAdornment: <Lock sx={{ color: 'action.active', mr: 1 }} />,
+                  startAdornment: (
+                    <Lock sx={{ color: 'action.active', mr: 1 }} />
+                  ),
                 }}
-                sx={{ background: 'rgba(255, 255, 255, 0.1)', borderRadius: '5px' }} // Fundo sutil
+                sx={{
+                  background: 'rgba(255, 255, 255, 0.1)',
+                  borderRadius: '5px',
+                }} // Fundo sutil
               />
               {/* Campo de Confirmação de Senha */}
               <TextField
@@ -165,9 +196,14 @@ const SignUp = () => {
                 value={confirmPassword}
                 onChange={(e) => setConfirmPassword(e.target.value)}
                 InputProps={{
-                  startAdornment: <Lock sx={{ color: 'action.active', mr: 1 }} />,
+                  startAdornment: (
+                    <Lock sx={{ color: 'action.active', mr: 1 }} />
+                  ),
                 }}
-                sx={{ background: 'rgba(255, 255, 255, 0.1)', borderRadius: '5px' }} // Fundo sutil
+                sx={{
+                  background: 'rgba(255, 255, 255, 0.1)',
+                  borderRadius: '5px',
+                }} // Fundo sutil
               />
               {/* Exibição de Erro */}
               {error && (
@@ -184,11 +220,13 @@ const SignUp = () => {
                 sx={{
                   mt: 3,
                   mb: 2,
-                  background: 'linear-gradient(135deg, #0a192f 0%, #2575fc 100%)', // Gradiente no botão
+                  background:
+                    'linear-gradient(135deg, #0a192f 0%, #2575fc 100%)', // Gradiente no botão
                   color: 'white',
                   borderRadius: '8px', // Bordas arredondadas
                   '&:hover': {
-                    background: 'linear-gradient(135deg, #2575fc 0%, #0a192f 100%)', // Gradiente invertido ao passar o mouse
+                    background:
+                      'linear-gradient(135deg, #2575fc 0%, #0a192f 100%)', // Gradiente invertido ao passar o mouse
                   },
                 }}
               >
@@ -202,7 +240,11 @@ const SignUp = () => {
                 component="button"
                 variant="body2"
                 onClick={handleRedirectToLogin}
-                sx={{ color: 'primary.main', textDecoration: 'none', '&:hover': { textDecoration: 'underline' } }}
+                sx={{
+                  color: 'primary.main',
+                  textDecoration: 'none',
+                  '&:hover': { textDecoration: 'underline' },
+                }}
               >
                 Entrar
               </Link>
