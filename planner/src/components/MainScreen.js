@@ -1,23 +1,69 @@
 import React, { useEffect } from 'react';
-import { Outlet, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import Menu from './Menu';
 
 const MainScreen = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    // Verifica se o usuário está autenticado
     const token = localStorage.getItem('token');
-    if (!token) {
-      // Se não houver token, redireciona para a tela de login
-      navigate('/login');
-    }
+    if (!token) navigate('/login');
   }, [navigate]);
 
   return (
-    <div>
-      <Menu /> {/* Menu sem a necessidade de userRole */}
-      <Outlet /> {/* Rotas filhas */}
+    <div
+      style={{
+        fontFamily: 'Arial',
+        width: '100vw',
+        height: '100vh',
+      }}
+    >
+      <div
+        style={{
+          position: 'absolute',
+          top: 0,
+          left: 0,
+          width: '100vw',
+          height: '100vh',
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+        }}
+      >
+        <div
+          style={{
+            position: 'absolute',
+            top: '0',
+            left: '0',
+            width: '100vw',
+            height: '100vh',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+          }}
+        >
+          <img src="/bg-pattern.png" alt="" style={{ position: 'absolute' }} />
+          <div
+            style={{
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+            }}
+          >
+            <img src="/logo.svg" alt="" />
+            <p
+              style={{
+                color: '#fff',
+                marginTop: '.6rem',
+                fontSize: '24px',
+              }}
+            >
+              Planeje sua próxima viagem com amigos!
+            </p>
+          </div>
+        </div>
+      </div>
+      <Menu />
     </div>
   );
 };
