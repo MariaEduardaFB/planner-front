@@ -15,24 +15,7 @@ import {
 } from '@mui/material';
 import { Email, Lock } from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
-
-// Tema escuro personalizado
-const darkTheme = createTheme({
-  palette: {
-    mode: 'dark',
-    primary: {
-      main: '#90caf9', // Azul claro
-    },
-    background: {
-      default: '#121212', // Fundo escuro
-      paper: 'rgba(30, 30, 30, 0.5)', // Transparência no cartão
-    },
-    text: {
-      primary: '#ffffff', // Texto branco
-      secondary: '#b3b3b3', // Texto cinza
-    },
-  },
-});
+import { darkTheme } from '../styles/dark';
 
 const Login = ({ onLogin }) => {
   const [email, setEmail] = useState('');
@@ -91,10 +74,19 @@ const Login = ({ onLogin }) => {
               border: '1px solid rgba(255, 255, 255, 0.18)', // Borda sutil
             }}
           >
-            <Typography component="h1" variant="h5" sx={{ mb: 2 }}>
-              Entre
-            </Typography>
-            <Box component="form" onSubmit={handleSubmit} sx={{ width: '100%' }}>
+            <img
+              src="/logo.svg"
+              alt=""
+              style={{
+                width: '300px',
+                zIndex: -1,
+              }}
+            />
+            <Box
+              component="form"
+              onSubmit={handleSubmit}
+              sx={{ width: '100%' }}
+            >
               {/* Campo de Email */}
               <TextField
                 fullWidth
@@ -107,9 +99,14 @@ const Login = ({ onLogin }) => {
                 error={!!email && !isEmailValid()}
                 helperText={!!email && !isEmailValid() ? 'Email inválido' : ''}
                 InputProps={{
-                  startAdornment: <Email sx={{ color: 'action.active', mr: 1 }} />,
+                  startAdornment: (
+                    <Email sx={{ color: 'action.active', mr: 1 }} />
+                  ),
                 }}
-                sx={{ background: 'rgba(255, 255, 255, 0.1)', borderRadius: '5px' }} // Fundo sutil
+                sx={{
+                  background: 'rgba(255, 255, 255, 0.1)',
+                  borderRadius: '5px',
+                }} // Fundo sutil
               />
               {/* Campo de Senha */}
               <TextField
@@ -121,9 +118,14 @@ const Login = ({ onLogin }) => {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 InputProps={{
-                  startAdornment: <Lock sx={{ color: 'action.active', mr: 1 }} />,
+                  startAdornment: (
+                    <Lock sx={{ color: 'action.active', mr: 1 }} />
+                  ),
                 }}
-                sx={{ background: 'rgba(255, 255, 255, 0.1)', borderRadius: '5px' }} // Fundo sutil
+                sx={{
+                  background: 'rgba(255, 255, 255, 0.1)',
+                  borderRadius: '5px',
+                }} // Fundo sutil
               />
               {/* Exibição de Erro */}
               {error && (
@@ -140,11 +142,13 @@ const Login = ({ onLogin }) => {
                 sx={{
                   mt: 3,
                   mb: 2,
-                  background: 'linear-gradient(135deg, #0a192f 0%, #2575fc 100%)', // Gradiente no botão
+                  background:
+                    'linear-gradient(135deg, #0a192f 0%, #2575fc 100%)', // Gradiente no botão
                   color: 'white',
                   borderRadius: '8px', // Bordas arredondadas
                   '&:hover': {
-                    background: 'linear-gradient(135deg, #2575fc 0%, #0a192f 100%)', // Gradiente invertido ao passar o mouse
+                    background:
+                      'linear-gradient(135deg, #2575fc 0%, #0a192f 100%)', // Gradiente invertido ao passar o mouse
                   },
                 }}
               >
@@ -158,7 +162,11 @@ const Login = ({ onLogin }) => {
                 component="button"
                 variant="body2"
                 onClick={handleRedirectToSignUp}
-                sx={{ color: 'primary.main', textDecoration: 'none', '&:hover': { textDecoration: 'underline' } }}
+                sx={{
+                  color: 'primary.main',
+                  textDecoration: 'none',
+                  '&:hover': { textDecoration: 'underline' },
+                }}
               >
                 Cadastre-se
               </Link>
