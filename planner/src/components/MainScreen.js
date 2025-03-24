@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Outlet } from 'react-router-dom';
 import Menu from './Menu';
 
 const MainScreen = () => {
@@ -15,31 +15,30 @@ const MainScreen = () => {
       style={{
         fontFamily: 'Arial',
         width: '100vw',
-        height: '100vh',
+        minHeight: '100vh',
+        paddingTop: '80px', // Espaço para o menu fixo
       }}
     >
-      <div
-        style={{
-          position: 'absolute',
-          top: 0,
-          left: 0,
-          width: '100vw',
-          height: '100vh',
-          display: 'flex',
-          justifyContent: 'center',
-          alignItems: 'center',
-        }}
-      >
+      <Menu />
+      
+      {/* Conteúdo principal com padding para não ficar sob o menu */}
+      <div style={{ padding: '20px' }}>
+        <Outlet />
+      </div>
+
+      {/* Background padrão só para a rota raiz */}
+      {window.location.pathname === '/' && (
         <div
           style={{
-            position: 'absolute',
-            top: '0',
-            left: '0',
+            position: 'fixed',
+            top: 0,
+            left: 0,
             width: '100vw',
             height: '100vh',
             display: 'flex',
-            alignItems: 'center',
             justifyContent: 'center',
+            alignItems: 'center',
+            zIndex: -1,
           }}
         >
           <img src="/bg-pattern.png" alt="" style={{ position: 'absolute' }} />
@@ -62,8 +61,7 @@ const MainScreen = () => {
             </p>
           </div>
         </div>
-      </div>
-      <Menu />
+      )}
     </div>
   );
 };
