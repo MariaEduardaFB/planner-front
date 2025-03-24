@@ -17,7 +17,7 @@ const MenuItem = ({ label, path, currentPath }) => {
       onMouseLeave={() => setHover(false)}
       style={{
         padding: '0.5rem 1rem',
-        backgroundColor: isActive ? '#3965A5' : 'transparent',
+        // backgroundColor: isActive ? '#3965A5' : 'transparent',
         borderRadius: '8px',
         transition: 'all 0.3s ease',
       }}
@@ -25,7 +25,7 @@ const MenuItem = ({ label, path, currentPath }) => {
       <Link
         to={path}
         style={{
-          color: isActive ? '#fff' : (hover ? '#3965A5' : '#fff'),
+            color: hover ? '#3965A5' : '#fff', // Muda a cor do texto no hover
           textDecoration: 'none',
           cursor: 'pointer',
           fontWeight: isActive ? 'bold' : 'normal',

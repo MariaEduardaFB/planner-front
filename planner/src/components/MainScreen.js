@@ -16,6 +16,7 @@ const MainScreen = () => {
         fontFamily: 'Arial',
         width: '100vw',
         minHeight: '100vh',
+        overflow: 'hidden', 
         paddingTop: '80px', // Espaço para o menu fixo
       }}
     >
@@ -41,7 +42,7 @@ const MainScreen = () => {
             zIndex: -1,
           }}
         >
-          <img src="/bg-pattern.png" alt="" style={{ position: 'absolute' }} />
+          <img src="/bg-pattern.png" alt="" style={{ position: 'fixed' }} />
           <div
             style={{
               display: 'flex',
