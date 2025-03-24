@@ -1,9 +1,10 @@
 import React from 'react';
-import { BrowserRouter, Route, Routes, Navigate } from 'react-router-dom';
+import { BrowserRouter, Route, Routes, Navigate, Outlet } from 'react-router-dom';
 import Login from '../components/Login';
 import SignUp from '../components/SignUp';
 import MainScreen from '../components/MainScreen';
 import { IoMdExit } from 'react-icons/io';
+import ViagensList from '../components/viagens/viagensList';
 
 const Layout = ({ children, setAuthenticated }) => {
   const handleLogout = () => {
@@ -75,10 +76,11 @@ const AppRoutes = ({ isAuthenticated, setAuthenticated }) => {
             )
           }
         >
-          {/* As rotas como /users, /categories, etc., estão aninhadas dentro da rota raiz / no MainScreen, usando o Outlet para renderizar o conteúdo. */}
+          <Route index element={<div>Página Inicial</div>} />
+          <Route path="viagens" element={<ViagensList />} />
+          {/* Outras rotas podem ser adicionadas aqui */}
         </Route>
 
-        {/* Rotas inválidas redirecionam para / (se autenticado) ou /login (se não autenticado). */}
         <Route
           path="*"
           element={<Navigate to={isAuthenticated ? '/' : '/login'} />}
