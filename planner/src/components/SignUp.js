@@ -14,6 +14,7 @@ import {
 } from '@mui/material';
 import { Email, Lock, Person } from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
+import api from '../services/api';
 
 // Tema escuro personalizado
 const darkTheme = createTheme({
@@ -68,7 +69,7 @@ const SignUp = () => {
     try {
       // Simulação de cadastro
       console.log('Cadastro realizado:', { name, email, password });
-      navigate('/login');
+      const response = await api.post('/auth/signup', { name, email, password });
     } catch (err) {
       setError('Erro ao cadastrar. Tente novamente.');
     } finally {
@@ -217,6 +218,7 @@ const SignUp = () => {
                 fullWidth
                 variant="contained"
                 disabled={loading}
+                onClick={handleSubmit}
                 sx={{
                   mt: 3,
                   mb: 2,
