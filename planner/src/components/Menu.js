@@ -2,9 +2,8 @@ import React, { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 
 const menuItems = [
-  { label: 'Inicio', path: '/' },  // Alterado para rota raiz
-  { label: 'Viagem', path: '/viagens' },
-  { label: 'Atividades', path: '/atividades' },
+  { label: 'Inicio', path: '/' }, // Rota para Tela Inicial
+  { label: 'Viagem', path: '/viagens' }, // Rota para Viagens
 ];
 
 const MenuItem = ({ label, path, currentPath }) => {
@@ -17,7 +16,6 @@ const MenuItem = ({ label, path, currentPath }) => {
       onMouseLeave={() => setHover(false)}
       style={{
         padding: '0.5rem 1rem',
-        // backgroundColor: isActive ? '#3965A5' : 'transparent',
         borderRadius: '8px',
         transition: 'all 0.3s ease',
       }}
@@ -25,7 +23,7 @@ const MenuItem = ({ label, path, currentPath }) => {
       <Link
         to={path}
         style={{
-            color: hover ? '#3965A5' : '#fff', // Muda a cor do texto no hover
+          color: hover ? '#3965A5' : '#fff', // Muda a cor do texto no hover
           textDecoration: 'none',
           cursor: 'pointer',
           fontWeight: isActive ? 'bold' : 'normal',
