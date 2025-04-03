@@ -52,7 +52,7 @@ const Menu = () => {
     >
       <ul
         style={{
-          background: '#262626',
+          background: '#0B1421',
           display: 'flex',
           padding: '.8rem 1.5rem',
           borderRadius: '15px',
