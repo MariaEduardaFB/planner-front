@@ -17,16 +17,17 @@ const useStyles = makeStyles((theme) => ({
     },
     searchContainer: {
       display: 'flex',
-      justifyContent: 'space-between',
-      marginBottom: '24px',
-      alignItems: 'center',
-      gap: '16px',
-      padding: '16px',
-      background: 'rgba(30, 30, 30, 0.7)',
-      borderRadius: '12px',
-      backdropFilter: 'blur(8px)',
-      border: '1px solid rgba(255, 255, 255, 0.1)',
-      boxShadow: '0 4px 20px rgba(0, 0, 0, 0.3)',
+    justifyContent: 'space-between',
+    marginBottom: '24px',
+    alignItems: 'center',
+    gap: '16px',
+    padding: '16px',
+    background: '#0B1421',
+    borderRadius: '12px',
+    backdropFilter: 'blur(8px)',
+    boxShadow: '0 4px 20px rgba(0, 0, 0, 0.3)',
+    width: '71%', // Ajuste a largura do contêiner
+    margin: '0 auto',
     },
     searchInput: {
       width: '300px',
@@ -130,7 +131,7 @@ const ViagensList = () => {
 
   const fetchViagens = async () => {
     try {
-      const response = await api.get(`viagens`);
+      const response = await api.get(`/viagens`);
       setViagens(response.data.viagens);
     } catch (error) {
       console.error('Erro ao buscar viagens:', error);
@@ -168,6 +169,7 @@ const ViagensList = () => {
       setOpenCreateModal(false);
       fetchViagens();
     } catch (error) {
+      console.log('Erro ao criar viagem:', error);
       console.error('Erro ao criar viagem:', error);
     }
   };
@@ -255,52 +257,73 @@ const ViagensList = () => {
         </Button>
       </Box>
 
-      <TableContainer component={Paper}>
+      <TableContainer component={Paper}
+      sx={{
+        backgroundColor: '#08172D', // Cor de fundo
+      boxShadow: '0 4px 20px rgba(0, 0, 0, 0.3)', // Sombra para destacar
+      borderRadius: '10px', // Bordas arredondadas
+      overflow: 'hidden', // Remove rolagem extra
+      border: '20px solid #0B1421',
+      width: '70%',
+      color: '#ffffff',
+      margin: '0 auto', // Centraliza horizontalmente
+      marginTop: '50px', // Espaço acima da tabela
+      }}>
         <Table>
           <TableHead>
             <TableRow>
-              <TableCell>ID</TableCell>
-              <TableCell>Organizador</TableCell>
-              <TableCell>País</TableCell>
-              <TableCell>Estado</TableCell>
-              <TableCell>Cidade</TableCell>
-              <TableCell>Data Início</TableCell>
-              <TableCell>Data Final</TableCell>
-              <TableCell>Confirmada</TableCell>
-              <TableCell>Ações</TableCell>
-            </TableRow>
+            <TableCell sx={{ color: '#ffffff', fontWeight: 'bold' }}>ID</TableCell>
+            <TableCell sx={{ color: '#ffffff', fontWeight: 'bold' }}>Organizador</TableCell>
+            <TableCell sx={{ color: '#ffffff', fontWeight: 'bold' }}>País</TableCell>
+            <TableCell sx={{ color: '#ffffff', fontWeight: 'bold' }}>Estado</TableCell>
+            <TableCell sx={{ color: '#ffffff', fontWeight: 'bold' }}>Cidade</TableCell>
+            <TableCell sx={{ color: '#ffffff', fontWeight: 'bold' }}>Data Início</TableCell>
+            <TableCell sx={{ color: '#ffffff', fontWeight: 'bold' }}>Data Final</TableCell>
+            <TableCell sx={{ color: '#ffffff', fontWeight: 'bold' }}>Confirmada</TableCell>
+            <TableCell sx={{ color: '#ffffff', fontWeight: 'bold' }}>Ações</TableCell>
+          </TableRow>
+            
           </TableHead>
           <TableBody>
-            {viagens.map((viagem) => (
-              <TableRow key={viagem.id}>
-                <TableCell>{viagem.id}</TableCell>
-                <TableCell>{viagem.organizador}</TableCell>
-                <TableCell>{viagem.pais}</TableCell>
-                <TableCell>{viagem.estado}</TableCell>
-                <TableCell>{viagem.cidade}</TableCell>
-                <TableCell>{viagem.dataInicio}</TableCell>
-                <TableCell>{viagem.dataFinal || '-'}</TableCell>
-                <TableCell>{viagem.confirmada ? 'Sim' : 'Não'}</TableCell>
-                <TableCell>
-                  <IconButton
-                    color="primary"
-                    onClick={() => {
-                      setCurrentViagem(viagem);
-                      setOpenEditModal(true);
-                    }}
-                  >
-                    <Edit />
-                  </IconButton>
-                  <IconButton
-                    color="error"
-                    onClick={() => handleDeleteViagem(viagem.id)}
-                  >
-                    <Delete />
-                  </IconButton>
-                </TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
+  {viagens.map((viagem) => (
+    <TableRow
+      key={viagem.id}
+      sx={{
+        backgroundColor: '#08172D',
+        '& td, & th': {
+          borderBottom: '2px solid #0B1421',} // Cor de fundo para linhas ímpares
+      }}
+    >
+      <TableCell sx={{ color: '#ffffff' }}>{viagem.id}</TableCell>
+      <TableCell sx={{ color: '#ffffff' }}>{viagem.organizador}</TableCell>
+      <TableCell sx={{ color: '#ffffff' }}>{viagem.pais}</TableCell>
+      <TableCell sx={{ color: '#ffffff' }}>{viagem.estado}</TableCell>
+      <TableCell sx={{ color: '#ffffff' }}>{viagem.cidade}</TableCell>
+      <TableCell sx={{ color: '#ffffff' }}>{viagem.dataInicio}</TableCell>
+      <TableCell sx={{ color: '#ffffff' }}>{viagem.dataFinal || '-'}</TableCell>
+      <TableCell sx={{ color: '#ffffff' }}>
+        {viagem.confirmada ? 'Sim' : 'Não'}
+      </TableCell>
+      <TableCell>
+        <IconButton
+          color="primary"
+          onClick={() => {
+            setCurrentViagem(viagem);
+            setOpenEditModal(true);
+          }}
+        >
+          <Edit />
+        </IconButton>
+        <IconButton
+          color="error"
+          onClick={() => handleDeleteViagem(viagem.id)}
+        >
+          <Delete />
+        </IconButton>
+      </TableCell>
+    </TableRow>
+  ))}
+</TableBody>
         </Table>
       </TableContainer>
 
