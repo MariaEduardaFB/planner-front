@@ -2,9 +2,10 @@ import React, { useEffect, useState } from 'react';
 import {
   Table, TableBody, TableCell, TableContainer, TableHead, TableRow,
   Paper, Button, TextField, Box, IconButton, Modal, Typography, Checkbox, 
-  FormControlLabel, MenuItem, Select
+  FormControlLabel, MenuItem, Select,
 } from '@mui/material';
-import { Edit, Delete, PersonAdd, Info} from '@mui/icons-material';
+import Snackbar from '@mui/material/Snackbar';
+import { Edit, Delete, PersonAdd, Info, CheckCircle,} from '@mui/icons-material';
 import { makeStyles } from '@mui/styles';
 import api from '../../services/api';
 
@@ -135,6 +136,8 @@ const ViagensList = () => {
   const [inviteError, setInviteError] = useState('');
   const [inviteSuccess, setInviteSuccess] = useState(false);
   const [participantError, setParticipantError] = useState('');
+  const [showConfirmModal, setShowConfirmModal] = useState(false);
+  const [participantToRemove, setParticipantToRemove] = useState(null);
 
   const [userRole, setUserRole] = useState('');
 
@@ -292,6 +295,59 @@ useEffect(() => {
     }));
   };
 
+  const [confirmationMessage, setConfirmationMessage] = useState(''); // Estado para a mensagem de confirmação
+
+  const handleConfirmViagem = async (viagemId) => {
+    try {
+      await api.post(`/viagens/${viagemId}/confirmar`, null, {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem('token')}`,
+        },
+      });
+  
+      // Atualiza o estado local para refletir a confirmação
+      setViagens((prevViagens) =>
+        prevViagens.map((viagem) =>
+          viagem.id === viagemId ? { ...viagem, confirmada: true } : viagem
+        )
+      );
+  
+      setConfirmationMessage('Viagem confirmada com sucesso!'); // Define a mensagem de confirmação
+    } catch (error) {
+      console.error('Erro ao confirmar viagem:', error);
+    }
+  };
+
+  const handleRemoveParticipant = async (participantId) => {
+    // Exibe uma mensagem de confirmação antes de excluir
+    const confirmDelete = window.confirm('Tem certeza que deseja remover este participante?');
+    if (!confirmDelete) {
+      return; // Cancela a exclusão se o usuário clicar em "Cancelar"
+    }
+  
+    try {
+      // Chama a rota correta do backend
+      await api.delete(`/viagens/${currentViagem.id}/participantes/${participantId}`, {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem('token')}`,
+        },
+      });
+  
+      // Atualiza a lista de participantes localmente
+      setCurrentViagem((prev) => ({
+        ...prev,
+        convidados: prev.convidados.filter((p) => p.id !== participantId),
+      }));
+  
+      console.log(`Participante com ID ${participantId} removido com sucesso.`);
+    } catch (error) {
+      console.error('Erro ao remover participante:', error.response?.data || error.message);
+    }
+  };
+
+  const [showParticipantDetailsModal, setShowParticipantDetailsModal] = useState(false);
+  const [selectedParticipant, setSelectedParticipant] = useState(null);
+
   useEffect(() => {
     fetchViagens();
   }, []);
@@ -324,13 +380,15 @@ useEffect(() => {
             Buscar
           </Button>
         </Box>
-        <Button
-          variant="contained"
-          color="primary"
-          onClick={() => setOpenCreateModal(true)}
-        >
-          Nova Viagem
-        </Button>
+        {userRole === 'organizador' && (
+  <Button
+    variant="contained"
+    color="primary"
+    onClick={() => setOpenCreateModal(true)}
+  >
+    Nova Viagem
+  </Button>
+)}
       </Box>
 
       <TableContainer component={Paper}
@@ -367,69 +425,6 @@ useEffect(() => {
       sx={{
         backgroundColor: '#08172D',
         '& td, & th': {
-          borderBottom: '2px solid #0B1421',} // Cor de fundo para linhas ímpares
-      }}
-    >
-      <TableCell sx={{ color: '#ffffff' }}>{viagem.id}</TableCell>
-      <TableCell sx={{ color: '#ffffff' }}>
-        {viagem.organizador?.name || 'Não informado'}
-      </TableCell>
-      <TableCell sx={{ color: '#ffffff' }}>{viagem.pais}</TableCell>
-      <TableCell sx={{ color: '#ffffff' }}>{viagem.estado}</TableCell>
-      <TableCell sx={{ color: '#ffffff' }}>{viagem.cidade}</TableCell>
-      <TableCell sx={{ color: '#ffffff' }}>{viagem.dataInicio}</TableCell>
-      <TableCell sx={{ color: '#ffffff' }}>{viagem.dataFinal || '-'}</TableCell>
-      <TableCell sx={{ color: '#ffffff' }}>
-        {viagem.confirmada ? 'Sim' : 'Não'}
-      </TableCell>
-      <TableCell>
-        <IconButton
-          color="primary"
-          onClick={() => {
-            setCurrentViagem(viagem); // Define a viagem atual
-            setShowAddParticipantModal(true); // Abre o modal de adicionar participante
-          }}
-        >
-          <IconButton
-    color="primary"
-    onClick={() => {
-      setCurrentViagem(viagem); // Define a viagem atual
-      setShowDetailsModal(true); // Abre o modal de detalhes
-      console.log('Dados da viagem selecionada:', currentViagem);
-    }}
-  >
-    <Info /> {/* Ícone para exibir informações */}
-  </IconButton>
-          <PersonAdd /> {/* Ícone para adicionar participante */}
-        </IconButton>
-        <IconButton
-          color="primary"
-          onClick={() => {
-            setCurrentViagem(viagem);
-            setOpenEditModal(true);
-          }}
-        >
-
-  
-          <Edit />
-        </IconButton>
-        <IconButton
-          color="error"
-          onClick={() => handleDeleteViagem(viagem.id)}
-        >
-          <Delete />
-        </IconButton>
-      </TableCell>
-    </TableRow>
-  ))}
-</TableBody>
-<TableBody>
-  {viagens.map((viagem) => (
-    <TableRow
-      key={viagem.id}
-      sx={{
-        backgroundColor: '#08172D',
-        '& td, & th': {
           borderBottom: '2px solid #0B1421',
         },
       }}
@@ -447,39 +442,81 @@ useEffect(() => {
         {viagem.confirmada ? 'Sim' : 'Não'}
       </TableCell>
       <TableCell>
-        <IconButton
-          color="primary"
-          onClick={() => {
-            setCurrentViagem(viagem);
-            setShowDetailsModal(true);
-          }}
-        >
-          <Info />
-        </IconButton>
-        {userRole === 'convidado' && !viagem.confirmada && (
-          <Button
-            variant="contained"
-            color="primary"
-            onClick={async () => {
-              try {
-                await api.post(`/viagens/${viagem.id}/confirmar`, null, {
-                  headers: {
-                    Authorization: `Bearer ${localStorage.getItem('token')}`,
-                  },
-                });
-                fetchViagens(); // Atualiza a lista de viagens
-              } catch (error) {
-                console.error('Erro ao confirmar participação:', error);
-              }
-            }}
-          >
-            Confirmar
-          </Button>
+        {/* Botões para organizador */}
+        {userRole === 'organizador' && (
+          <>
+            <IconButton
+              sx={{ color: '#64ffda' }} // Cor personalizada para o ícone de detalhes
+              onClick={() => {
+                setCurrentViagem(viagem);
+                setShowDetailsModal(true);
+              }}
+            >
+              <Info />
+            </IconButton>
+            <IconButton
+              sx={{ color: '#ff9800' }} // Cor personalizada para o ícone de edição
+              onClick={() => {
+                setCurrentViagem(viagem);
+                setOpenEditModal(true);
+              }}
+            >
+              <Edit />
+            </IconButton>
+            <IconButton
+              sx={{ color: '#f44336' }} // Cor personalizada para o ícone de exclusão
+              onClick={() => handleDeleteViagem(viagem.id)}
+            >
+              <Delete />
+            </IconButton>
+            <IconButton
+              sx={{ color: '#2196f3' }} // Cor personalizada para o ícone de adicionar participante
+              onClick={() => {
+                setCurrentViagem(viagem);
+                setShowAddParticipantModal(true);
+              }}
+            >
+              <PersonAdd />
+            </IconButton>
+          </>
+        )}
+
+        {/* Botões para convidado */}
+        {userRole === 'convidado' && (
+          <>
+            {/* Ícone para convidado confirmar a viagem */}
+            {userRole === 'convidado' && !viagem.confirmada && (
+                <IconButton
+                  color="primary"
+                  onClick={() => handleConfirmViagem(viagem.id)}
+                >
+                  <CheckCircle />
+                </IconButton>
+              )}
+              {/* Ícone para ver detalhes */}
+              <IconButton
+                color="primary"
+                onClick={() => {
+                  setCurrentViagem(viagem);
+                  setShowDetailsModal(true);
+                }}
+              >
+                <Info />
+              </IconButton>
+          
+          </>
         )}
       </TableCell>
     </TableRow>
   ))}
 </TableBody>
+<Snackbar
+        open={!!confirmationMessage}
+        autoHideDuration={3000}
+        onClose={() => setConfirmationMessage('')}
+        message={confirmationMessage}
+      />
+
         </Table>
       </TableContainer>
 
@@ -597,115 +634,213 @@ useEffect(() => {
 
       {/* Modal para editar viagem */}
       <Modal open={openEditModal} onClose={() => setOpenEditModal(false)}>
-        <Box className={classes.modalBox}>
-          <Typography variant="h6" className={classes.modalTitle}>
-            Editar Viagem
-          </Typography>
-          
-          <TextField
-            label="Data de Criação"
-            name="dataCriacao"
-            type="date"
-            variant="outlined"
-            fullWidth
-            value={currentViagem.dataCriacao}
-            onChange={handleChange}
-            className={classes.modalTextField}
-            InputLabelProps={{
-              shrink: true,
-            }}
-            disabled
-          />
-          
-          <TextField
-            label="Data de Início"
-            name="dataInicio"
-            type="date"
-            variant="outlined"
-            fullWidth
-            value={currentViagem.dataInicio}
-            onChange={handleChange}
-            className={classes.modalTextField}
-            InputLabelProps={{
-              shrink: true,
-            }}
-          />
-          
-          <TextField
-            label="Data Final"
-            name="dataFinal"
-            type="date"
-            variant="outlined"
-            fullWidth
-            value={currentViagem.dataFinal}
-            onChange={handleChange}
-            className={classes.modalTextField}
-            InputLabelProps={{
-              shrink: true,
-            }}
-          />
-          
-          <FormControlLabel
-            control={
-              <Checkbox
-                name="confirmada"
-                checked={currentViagem.confirmada}
-                onChange={handleChange}
-              />
-            }
-            label="Confirmada"
-            className={classes.modalTextField}
-          />
-          
-          <TextField
-            label="Organizador"
-            name="organizador"
-            variant="outlined"
-            fullWidth
-            value={currentViagem.organizador}
-            onChange={handleChange}
-            className={classes.modalTextField}
-          />
-          
-          <TextField
-            label="País"
-            name="pais"
-            variant="outlined"
-            fullWidth
-            value={currentViagem.pais}
-            onChange={handleChange}
-            required
-            className={classes.modalTextField}
-          />
-          
-          <TextField
-            label="Estado"
-            name="estado"
-            variant="outlined"
-            fullWidth
-            value={currentViagem.estado}
-            onChange={handleChange}
-            required
-            className={classes.modalTextField}
-          />
-          
-          <TextField
-            label="Cidade"
-            name="cidade"
-            variant="outlined"
-            fullWidth
-            value={currentViagem.cidade}
-            onChange={handleChange}
-            required
-            className={classes.modalTextField}
-          />
-          
-          <Button variant="contained" onClick={handleUpdateViagem}>
-            Atualizar
-          </Button>
+  <Box className={classes.modalBox}>
+    <Typography variant="h6" className={classes.modalTitle}>
+      Editar Viagem
+    </Typography>
 
+    {/* Campos do formulário */}
+    <TextField
+      label="Data de Início"
+      name="dataInicio"
+      type="date"
+      variant="outlined"
+      fullWidth
+      value={currentViagem.dataInicio}
+      onChange={handleChange}
+      className={classes.modalTextField}
+      InputLabelProps={{
+        shrink: true,
+      }}
+    />
+
+    <TextField
+      label="Data Final"
+      name="dataFinal"
+      type="date"
+      variant="outlined"
+      fullWidth
+      value={currentViagem.dataFinal}
+      onChange={handleChange}
+      className={classes.modalTextField}
+      InputLabelProps={{
+        shrink: true,
+      }}
+    />
+
+    <FormControlLabel
+      control={
+        <Checkbox
+          name="confirmada"
+          checked={currentViagem.confirmada}
+          onChange={handleChange}
+        />
+      }
+      label="Confirmada"
+      className={classes.modalTextField}
+    />
+
+    <TextField
+      label="Organizador"
+      name="organizador"
+      variant="outlined"
+      fullWidth
+      value={currentViagem.organizador}
+      onChange={handleChange}
+      className={classes.modalTextField}
+    />
+
+    <TextField
+      label="País"
+      name="pais"
+      variant="outlined"
+      fullWidth
+      value={currentViagem.pais}
+      onChange={handleChange}
+      required
+      className={classes.modalTextField}
+    />
+
+    <TextField
+      label="Estado"
+      name="estado"
+      variant="outlined"
+      fullWidth
+      value={currentViagem.estado}
+      onChange={handleChange}
+      required
+      className={classes.modalTextField}
+    />
+
+    <TextField
+      label="Cidade"
+      name="cidade"
+      variant="outlined"
+      fullWidth
+      value={currentViagem.cidade}
+      onChange={handleChange}
+      required
+      className={classes.modalTextField}
+    />
+
+    {/* Lista de participantes */}
+    <Typography variant="h6" className={classes.modalTitle}>
+      Participantes
+    </Typography>
+    {currentViagem.convidados && currentViagem.convidados.length > 0 ? (
+      currentViagem.convidados.map((p, index) => (
+        <Box
+          key={index}
+          sx={{
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            mb: 2,
+          }}
+        >
+          <Typography>
+            {p.name} ({p.email})
+          </Typography>
+          <IconButton
+          sx={{ color: '#f44336' }}
+          onClick={() => {
+            setParticipantToRemove(p.id); // Define o participante a ser removido
+            setShowConfirmModal(true); // Abre o modal de confirmação
+          }}
+        >
+          <Delete />
+        </IconButton>
+        </Box>
+      ))
+    ) : (
+      <Typography>Nenhum participante adicionado.</Typography>
+    )}
+
+<Modal open={showConfirmModal} onClose={() => setShowConfirmModal(false)}>
+        <Box
+          sx={{
+            position: 'absolute',
+            top: '50%',
+            left: '50%',
+            transform: 'translate(-50%, -50%)',
+            width: 400,
+            bgcolor: 'background.paper',
+            boxShadow: 24,
+            p: 4,
+            borderRadius: '12px',
+          }}
+        >
+          <Typography variant="h6" mb={2}>
+            Confirmar Remoção
+          </Typography>
+          <Typography mb={3}>
+            Tem certeza que deseja remover este participante?
+          </Typography>
+          <Box sx={{ display: 'flex', justifyContent: 'flex-end', gap: 2 }}>
+            <Button
+              variant="outlined"
+              onClick={() => setShowConfirmModal(false)} // Fecha o modal
+              sx={{
+                color: '#f44336',
+                borderColor: '#f44336',
+                '&:hover': {
+                  backgroundColor: 'rgba(244, 67, 54, 0.1)',
+                },
+              }}
+            >
+              Cancelar
+            </Button>
+            <Button
+              variant="contained"
+              onClick={async () => {
+                await handleRemoveParticipant(participantToRemove); // Remove o participante
+                setShowConfirmModal(false); // Fecha o modal
+              }}
+              sx={{
+                backgroundColor: '#64ffda',
+                color: '#000',
+                '&:hover': {
+                  backgroundColor: '#52e0c4',
+                },
+              }}
+            >
+              Confirmar
+            </Button>
+          </Box>
         </Box>
       </Modal>
+
+    {/* Botões de ação */}
+    <Box sx={{ display: 'flex', justifyContent: 'flex-end', gap: 2, mt: 3 }}>
+      <Button
+        variant="outlined"
+        onClick={() => setOpenEditModal(false)} // Fecha o modal sem salvar
+        sx={{
+          color: '#f44336',
+          borderColor: '#f44336',
+          '&:hover': {
+            backgroundColor: 'rgba(244, 67, 54, 0.1)',
+          },
+        }}
+      >
+        Cancelar
+      </Button>
+      <Button
+        variant="contained"
+        onClick={handleUpdateViagem} // Salva as alterações
+        sx={{
+          backgroundColor: '#64ffda',
+          color: '#000',
+          '&:hover': {
+            backgroundColor: '#52e0c4',
+          },
+        }}
+      >
+        Atualizar
+      </Button>
+    </Box>
+  </Box>
+</Modal>
       <Modal open={showAddParticipantModal} onClose={() => setShowAddParticipantModal(false)}>
         <Box
           sx={{
@@ -821,31 +956,83 @@ useEffect(() => {
 
     <Typography variant="h6" mt={3}>Participantes</Typography>
     {currentViagem.convidados && currentViagem.convidados.length > 0 ? (
-      currentViagem.convidados.map((p, index) => (
-        <Box key={index} sx={{ mt: 1 }}>
-          <Typography>
-            {p.name} ({p.email}) - {p.UserViagem.confirmada ? 'Confirmado' : 'Não Confirmado'}
-          </Typography>
-        </Box>
-      ))
-    ) : (
-      <Typography>Nenhum participante adicionado.</Typography>
-      
-    )}
-  </Box>
-</Modal>
-<Typography variant="h6" mt={3}>Participantes Confirmados</Typography>
-{currentViagem.convidados && currentViagem.convidados.length > 0 ? (
   currentViagem.convidados.map((p, index) => (
-    <Box key={index} sx={{ mt: 1 }}>
+    <Box
+      key={index}
+      sx={{
+        display: 'flex',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        mb: 2,
+      }}
+    >
       <Typography>
         {p.name} ({p.email})
       </Typography>
+      <IconButton
+        sx={{ color: '#64ffda' }}
+        onClick={() => {
+          setSelectedParticipant(p); // Define o participante selecionado
+          setShowParticipantDetailsModal(true); // Abre o modal de detalhes
+        }}
+      >
+        <Info />
+      </IconButton>
     </Box>
   ))
 ) : (
-  <Typography>Nenhum participante confirmado.</Typography>
+  <Typography>Nenhum participante adicionado.</Typography>
 )}
+<Modal
+  open={showParticipantDetailsModal}
+  onClose={() => setShowParticipantDetailsModal(false)}
+>
+  <Box
+    sx={{
+      position: 'absolute',
+      top: '50%',
+      left: '50%',
+      transform: 'translate(-50%, -50%)',
+      width: 400,
+      bgcolor: 'background.paper',
+      boxShadow: 24,
+      p: 4,
+      borderRadius: '12px',
+    }}
+  >
+    <Typography variant="h6" mb={2}>
+      Detalhes do Participante
+    </Typography>
+    {selectedParticipant && (
+      <>
+        <Typography><strong>Nome:</strong> {selectedParticipant.name}</Typography>
+        <Typography><strong>Email:</strong> {selectedParticipant.email}</Typography>
+        <Typography>
+          <strong>Status de Confirmação:</strong>{' '}
+          {selectedParticipant.UserViagem?.confirmada ? 'Confirmado' : 'Não Confirmado'}
+        </Typography>
+      </>
+    )}
+    <Box sx={{ display: 'flex', justifyContent: 'flex-end', mt: 3 }}>
+      <Button
+        variant="outlined"
+        onClick={() => setShowParticipantDetailsModal(false)}
+        sx={{
+          color: '#f44336',
+          borderColor: '#f44336',
+          '&:hover': {
+            backgroundColor: 'rgba(244, 67, 54, 0.1)',
+          },
+        }}
+      >
+        Fechar
+      </Button>
+    </Box>
+  </Box>
+</Modal>
+  </Box>
+</Modal>
+
     </Box>
   );
 };
