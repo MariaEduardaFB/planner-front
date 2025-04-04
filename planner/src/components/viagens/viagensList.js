@@ -295,7 +295,9 @@ const ViagensList = () => {
       }}
     >
       <TableCell sx={{ color: '#ffffff' }}>{viagem.id}</TableCell>
-      <TableCell sx={{ color: '#ffffff' }}>{viagem.organizador}</TableCell>
+      <TableCell sx={{ color: '#ffffff' }}>
+        {viagem.organizador?.name || 'Não informado'}
+      </TableCell>
       <TableCell sx={{ color: '#ffffff' }}>{viagem.pais}</TableCell>
       <TableCell sx={{ color: '#ffffff' }}>{viagem.estado}</TableCell>
       <TableCell sx={{ color: '#ffffff' }}>{viagem.cidade}</TableCell>
