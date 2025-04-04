@@ -11,6 +11,11 @@ import {
   createTheme,
   CssBaseline,
   Link,
+  MenuItem,
+  Select,
+  FormControl,
+  InputLabel,
+  Alert,
 } from '@mui/material';
 import { Email, Lock, Person } from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
@@ -39,7 +44,9 @@ const SignUp = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
+  const [role, setRole] = useState(''); // Adicionando o estado para o papel
   const [error, setError] = useState('');
+  const [success, setSuccess] = useState('');
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
@@ -47,6 +54,7 @@ const SignUp = () => {
     e.preventDefault();
     setLoading(true);
     setError('');
+    setSuccess(false);
 
     if (!name || !email || !password || !confirmPassword) {
       setError('Todos os campos são obrigatórios.');
@@ -69,7 +77,8 @@ const SignUp = () => {
     try {
       // Simulação de cadastro
       console.log('Cadastro realizado:', { name, email, password });
-      const response = await api.post('/auth/signup', { name, email, password });
+      const response = await api.post('/auth/signup', { name, email, password, role });
+      setSuccess(true);
     } catch (err) {
       setError('Erro ao cadastrar. Tente novamente.');
     } finally {
@@ -206,11 +215,39 @@ const SignUp = () => {
                   borderRadius: '5px',
                 }} // Fundo sutil
               />
+              <FormControl fullWidth margin="normal">
+                <InputLabel id="role-label">Função</InputLabel>
+                <Select
+                  labelId="role-label"
+                  id="role"
+                  value={role}
+                  onChange={(e) => setRole(e.target.value)}
+                  sx={{
+                    background: 'rgba(255, 255, 255, 0.1)',
+                    borderRadius: '5px',
+                  }}
+                >
+                  <MenuItem value="organizador">Organizador</MenuItem>
+                  <MenuItem value="convidado">Convidado</MenuItem>
+                </Select>
+              </FormControl>
               {/* Exibição de Erro */}
               {error && (
                 <Typography color="error" variant="body2" sx={{ mt: 1 }}>
                   {error}
                 </Typography>
+              )}
+              {/* Exibição de Erro */}
+              {error && (
+                <Typography color="error" variant="body2" sx={{ mt: 1 }}>
+                  {error}
+                </Typography>
+              )}
+               {/* Exibição de Sucesso */}
+               {success && (
+                <Alert severity="success" sx={{ mt: 2 }}>
+                  Cadastro realizado com sucesso!
+                </Alert>
               )}
               {/* Botão de Cadastro */}
               <Button
