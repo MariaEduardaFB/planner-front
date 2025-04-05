@@ -5,7 +5,7 @@ import {
   FormControlLabel, MenuItem, Select,
 } from '@mui/material';
 import Snackbar from '@mui/material/Snackbar';
-import { Edit, Delete, PersonAdd, Info, CheckCircle,} from '@mui/icons-material';
+import { Edit, Delete, PersonAdd, Info, CheckCircle, Add,} from '@mui/icons-material';
 import { makeStyles } from '@mui/styles';
 import api from '../../services/api';
 
@@ -118,6 +118,8 @@ const ViagensList = () => {
     pais: '',
     estado: '',
     cidade: '',
+    convidados: [], // Inicialize como um array vazio
+    atividades: [], // Inicialize como um array vazio
   });
   const [newViagem, setNewViagem] = useState({
     dataCriacao: new Date().toISOString().split('T')[0],
@@ -130,6 +132,8 @@ const ViagensList = () => {
     cidade: '',
     participantes: [],
   });
+
+  
   const [showAddParticipantModal, setShowAddParticipantModal] = useState(false);
   const [participantEmail, setParticipantEmail] = useState('');
   const [participant, setParticipant] = useState(null);
@@ -138,6 +142,7 @@ const ViagensList = () => {
   const [participantError, setParticipantError] = useState('');
   const [showConfirmModal, setShowConfirmModal] = useState(false);
   const [participantToRemove, setParticipantToRemove] = useState(null);
+  const [openEditActivityModal, setOpenEditActivityModal] = useState(false);
 
   const [userRole, setUserRole] = useState('');
 
@@ -305,19 +310,19 @@ useEffect(() => {
         },
       });
   
-      // Atualiza o estado local para refletir a confirmação
-      setViagens((prevViagens) =>
-        prevViagens.map((viagem) =>
-          viagem.id === viagemId ? { ...viagem, confirmada: true } : viagem
-        )
-      );
+      // Atualiza os detalhes da viagem para refletir a confirmação
+      const viagemDetalhes = await api.get(`/viagens/${viagemId}`);
+      setCurrentViagem(viagemDetalhes.data);
   
-      setConfirmationMessage('Viagem confirmada com sucesso!'); // Define a mensagem de confirmação
+      setConfirmationMessage('Viagem confirmada com sucesso!');
     } catch (error) {
       console.error('Erro ao confirmar viagem:', error);
     }
   };
 
+  useEffect(() => {
+    console.log('Estado atualizado de currentViagem:', currentViagem);
+  }, [currentViagem]);
   const handleRemoveParticipant = async (participantId) => {
     // Exibe uma mensagem de confirmação antes de excluir
     const confirmDelete = window.confirm('Tem certeza que deseja remover este participante?');
@@ -344,10 +349,131 @@ useEffect(() => {
       console.error('Erro ao remover participante:', error.response?.data || error.message);
     }
   };
-
+  
   const [showParticipantDetailsModal, setShowParticipantDetailsModal] = useState(false);
   const [selectedParticipant, setSelectedParticipant] = useState(null);
+  const [openCreateActivityModal, setOpenCreateActivityModal] = useState(false);
+  const [newActivity, setNewActivity] = useState({
+    nome: '',
+    descricao: '',
+    data: '',
+    horario: '',
+  });
 
+  
+
+  const handleUpdateActivity = async () => {
+    if (!selectedActivity || !selectedActivity.id) {
+      console.error('Nenhuma atividade selecionada para editar.');
+      return;
+    }
+  
+    try {
+      const response = await api.put(
+        `/atividade/${selectedActivity.id}`,
+        {
+          titulo: selectedActivity.titulo,
+          descricao: selectedActivity.descricao,
+          dataAtividade: selectedActivity.dataAtividade,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem('token')}`,
+          },
+        }
+      );
+  
+      // Atualiza o estado `currentViagem` para refletir as alterações
+      setCurrentViagem((prev) => ({
+        ...prev,
+        atividades: prev.atividades.map((atividade) =>
+          atividade.id === selectedActivity.id ? response.data.atividade : atividade
+        ),
+      }));
+  
+      setOpenEditActivityModal(false);
+      console.log('Atividade atualizada com sucesso!');
+    } catch (error) {
+      console.error('Erro ao atualizar atividade:', error.response?.data || error.message);
+    }
+  };
+
+  const handleDeleteActivity = async (atividadeId) => {
+    if (!window.confirm('Tem certeza que deseja excluir esta atividade?')) {
+      return;
+    }
+  
+    try {
+      await api.delete(`/atividade/${atividadeId}`, {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem('token')}`,
+        },
+      });
+  
+      // Atualiza o estado `currentViagem` para remover a atividade excluída
+      setCurrentViagem((prev) => ({
+        ...prev,
+        atividades: prev.atividades.filter((atividade) => atividade.id !== atividadeId),
+      }));
+  
+      console.log('Atividade excluída com sucesso!');
+    } catch (error) {
+      console.error('Erro ao excluir atividade:', error.response?.data || error.message);
+    }
+  };
+
+  const handleCreateActivity = async () => {
+    if (!currentViagem.id) {
+      console.error('Nenhuma viagem selecionada para criar atividade.');
+      return;
+    }
+  
+    try {
+      const response = await api.post(
+        `/atividade`,
+        {
+          titulo: newActivity.nome,
+          dataAtividade: newActivity.data,
+          descricao: newActivity.descricao,
+          viagemId: currentViagem.id,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem('token')}`,
+          },
+        }
+      );
+  
+      // Atualiza o estado `currentViagem` para incluir a nova atividade
+      setCurrentViagem((prev) => ({
+        ...prev,
+        atividades: [...(prev.atividades || []), response.data.atividade],
+      }));
+  
+      setNewActivity({
+        nome: '',
+        descricao: '',
+        data: '',
+        horario: '',
+      });
+      setOpenCreateActivityModal(false);
+      console.log('Atividade criada com sucesso!');
+    } catch (error) {
+      console.error('Erro ao criar atividade:', error.response?.data || error.message);
+    }
+  };
+const [selectedActivity, setSelectedActivity] = useState(null); // Atividade selecionada
+const [showActivityDetailsModal, setShowActivityDetailsModal] = useState(false); // Modal de detalhes da atividade
+
+const handleShowDetails = async (viagem) => {
+  try {
+    const response = await api.get(`/viagens/${viagem.id}`);
+    setCurrentViagem(response.data); // Atualiza os detalhes da viagem, incluindo os participantes
+    setShowDetailsModal(true);
+  } catch (error) {
+    console.error('Erro ao carregar detalhes da viagem:', error);
+  }
+};
   useEffect(() => {
     fetchViagens();
   }, []);
@@ -445,6 +571,7 @@ useEffect(() => {
         {/* Botões para organizador */}
         {userRole === 'organizador' && (
           <>
+          
             <IconButton
               sx={{ color: '#64ffda' }} // Cor personalizada para o ícone de detalhes
               onClick={() => {
@@ -519,6 +646,92 @@ useEffect(() => {
 
         </Table>
       </TableContainer>
+      <Modal open={openCreateActivityModal} onClose={() => setOpenCreateActivityModal(false)}>
+  <Box className={classes.modalBox}>
+    <Typography variant="h6" className={classes.modalTitle}>
+      Criar Atividade para a Viagem: {currentViagem.pais} - {currentViagem.cidade}
+    </Typography>
+
+    <TextField
+      label="Nome da Atividade"
+      name="nome"
+      variant="outlined"
+      fullWidth
+      value={newActivity.nome}
+      onChange={(e) => setNewActivity({ ...newActivity, nome: e.target.value })}
+      className={classes.modalTextField}
+    />
+
+    <TextField
+      label="Descrição"
+      name="descricao"
+      variant="outlined"
+      fullWidth
+      multiline
+      rows={3}
+      value={newActivity.descricao}
+      onChange={(e) => setNewActivity({ ...newActivity, descricao: e.target.value })}
+      className={classes.modalTextField}
+    />
+
+    <TextField
+      label="Data"
+      name="data"
+      type="date"
+      variant="outlined"
+      fullWidth
+      value={newActivity.data}
+      onChange={(e) => setNewActivity({ ...newActivity, data: e.target.value })}
+      className={classes.modalTextField}
+      InputLabelProps={{
+        shrink: true,
+      }}
+    />
+
+    <TextField
+      label="Horário"
+      name="horario"
+      type="time"
+      variant="outlined"
+      fullWidth
+      value={newActivity.horario}
+      onChange={(e) => setNewActivity({ ...newActivity, horario: e.target.value })}
+      className={classes.modalTextField}
+      InputLabelProps={{
+        shrink: true,
+      }}
+    />
+
+    <Box sx={{ display: 'flex', justifyContent: 'flex-end', gap: 2, mt: 3 }}>
+      <Button
+        variant="outlined"
+        onClick={() => setOpenCreateActivityModal(false)} // Fecha o modal sem salvar
+        sx={{
+          color: '#f44336',
+          borderColor: '#f44336',
+          '&:hover': {
+            backgroundColor: 'rgba(244, 67, 54, 0.1)',
+          },
+        }}
+      >
+        Cancelar
+      </Button>
+      <Button
+  variant="contained"
+  onClick={handleCreateActivity} // Certifique-se de que a função está sendo chamada aqui
+  sx={{
+    backgroundColor: '#4caf50',
+    color: '#fff',
+    '&:hover': {
+      backgroundColor: '#45a049',
+    },
+  }}
+>
+  Salvar
+</Button>
+    </Box>
+  </Box>
+</Modal>
 
       {/* Modal para criar viagem */}
       <Modal open={openCreateModal} onClose={() => setOpenCreateModal(false)}>
@@ -725,36 +938,76 @@ useEffect(() => {
 
     {/* Lista de participantes */}
     <Typography variant="h6" className={classes.modalTitle}>
-      Participantes
-    </Typography>
-    {currentViagem.convidados && currentViagem.convidados.length > 0 ? (
-      currentViagem.convidados.map((p, index) => (
-        <Box
-          key={index}
-          sx={{
-            display: 'flex',
-            justifyContent: 'space-between',
-            alignItems: 'center',
-            mb: 2,
+  Participantes
+</Typography>
+{currentViagem.convidados && currentViagem.convidados.length > 0 ? (
+  currentViagem.convidados.map((p, index) => (
+    <Box
+      key={index}
+      sx={{
+        display: 'flex',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        mb: 2,
+      }}
+    >
+      <Box>
+        <Typography>
+          {p.name} ({p.email})
+        </Typography>
+        <Typography variant="body2" sx={{ color: p.UserViagem.confirmada ? '#4caf50' : '#f44336' }}>
+          {p.UserViagem.confirmada ? 'Confirmado' : 'Não Confirmado'}
+        </Typography>
+      </Box>
+    </Box>
+  ))
+) : (
+  <Typography>Nenhum participante adicionado.</Typography>
+)}
+
+{currentViagem.atividades && currentViagem.atividades.length > 0 ? (
+  currentViagem.atividades.map((atividade, index) => (
+    <Box
+      key={index}
+      sx={{
+        display: 'flex',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        mb: 2,
+      }}
+    >
+      <Typography>{atividade.titulo}</Typography>
+      <Box>
+        <IconButton
+          sx={{ color: '#64ffda' }}
+          onClick={() => {
+            setSelectedActivity(atividade);
+            setShowActivityDetailsModal(true);
           }}
         >
-          <Typography>
-            {p.name} ({p.email})
-          </Typography>
-          <IconButton
-          sx={{ color: '#f44336' }}
+          <Info />
+        </IconButton>
+        <IconButton
+          sx={{ color: '#ff9800' }}
           onClick={() => {
-            setParticipantToRemove(p.id); // Define o participante a ser removido
-            setShowConfirmModal(true); // Abre o modal de confirmação
+            setSelectedActivity(atividade);
+            setOpenEditActivityModal(true);
           }}
+        >
+          <Edit />
+        </IconButton>
+        <IconButton
+          sx={{ color: '#f44336' }}
+          onClick={() => handleDeleteActivity(atividade.id)}
         >
           <Delete />
         </IconButton>
-        </Box>
-      ))
-    ) : (
-      <Typography>Nenhum participante adicionado.</Typography>
-    )}
+      </Box>
+    </Box>
+  ))
+) : (
+  <Typography>Nenhuma atividade adicionada.</Typography>
+)}
 
 <Modal open={showConfirmModal} onClose={() => setShowConfirmModal(false)}>
         <Box
@@ -954,8 +1207,10 @@ useEffect(() => {
     <Typography><strong>Data Final:</strong> {currentViagem.dataFinal || '-'}</Typography>
     <Typography><strong>Confirmada:</strong> {currentViagem.confirmada ? 'Sim' : 'Não'}</Typography>
 
-    <Typography variant="h6" mt={3}>Participantes</Typography>
-    {currentViagem.convidados && currentViagem.convidados.length > 0 ? (
+    <Typography variant="h6" className={classes.modalTitle}>
+  Participantes
+</Typography>
+{currentViagem.convidados && currentViagem.convidados.length > 0 ? (
   currentViagem.convidados.map((p, index) => (
     <Box
       key={index}
@@ -966,14 +1221,19 @@ useEffect(() => {
         mb: 2,
       }}
     >
-      <Typography>
-        {p.name} ({p.email})
-      </Typography>
+      <Box>
+        <Typography>
+          {p.name} ({p.email})
+        </Typography>
+        <Typography variant="body2" sx={{ color: p.UserViagem.confirmada ? '#4caf50' : '#f44336' }}>
+          {p.UserViagem.confirmada ? 'Confirmado' : 'Não Confirmado'}
+        </Typography>
+      </Box>
       <IconButton
         sx={{ color: '#64ffda' }}
         onClick={() => {
           setSelectedParticipant(p); // Define o participante selecionado
-          setShowParticipantDetailsModal(true); // Abre o modal de detalhes
+          setShowParticipantDetailsModal(true); // Abre o modal de detalhes do participante
         }}
       >
         <Info />
@@ -983,10 +1243,109 @@ useEffect(() => {
 ) : (
   <Typography>Nenhum participante adicionado.</Typography>
 )}
-<Modal
-  open={showParticipantDetailsModal}
-  onClose={() => setShowParticipantDetailsModal(false)}
->
+
+<Typography variant="h6" className={classes.modalTitle} sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between',  color: 'black', }}>
+  Atividades
+  <Button
+    variant="contained"
+    onClick={() => setOpenCreateActivityModal(true)} // Abre o modal de criação de atividade
+    sx={{
+      backgroundColor: '#4caf50',
+      color: '#fff',
+      '&:hover': {
+        backgroundColor: '#45a049',
+      },
+    }}
+  >
+    Criar Atividade
+  </Button>
+</Typography>
+
+{currentViagem.atividades && currentViagem.atividades.length > 0 ? (
+  currentViagem.atividades.map((atividade, index) => (
+    <Box
+      key={index}
+      sx={{
+        display: 'flex',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        mb: 2,
+      }}
+    >
+      <Typography>{atividade.titulo}</Typography>
+      <Box>
+        <IconButton
+          sx={{ color: '#64ffda' }}
+          onClick={() => {
+            setSelectedActivity(atividade); // Define a atividade selecionada
+            setShowActivityDetailsModal(true); // Abre o modal de detalhes da atividade
+          }}
+        >
+          <Info />
+        </IconButton>
+        <IconButton
+          sx={{ color: '#ff9800' }}
+          onClick={() => {
+            setSelectedActivity(atividade); // Define a atividade selecionada
+            setOpenEditActivityModal(true); // Abre o modal de edição da atividade
+          }}
+        >
+          <Edit />
+        </IconButton>
+        <IconButton
+          sx={{ color: '#f44336' }}
+          onClick={() => handleDeleteActivity(atividade.id)} // Função para excluir a atividade
+        >
+          <Delete />
+        </IconButton>
+      </Box>
+    </Box>
+  ))
+) : (
+  <Typography>Nenhuma atividade adicionada.</Typography>
+)} </Box>
+</Modal>
+<Modal open={showActivityDetailsModal} onClose={() => setShowActivityDetailsModal(false)}>
+  <Box
+    sx={{
+      position: 'absolute',
+      top: '50%',
+      left: '50%',
+      transform: 'translate(-50%, -50%)',
+      width: 400,
+      bgcolor: 'background.paper',
+      boxShadow: 24,
+      p: 4,
+      borderRadius: '12px',
+    }}
+  >
+    <Typography variant="h6" mb={2}>
+      Detalhes da Atividade
+    </Typography>
+    {selectedActivity && (
+      <>
+        <Typography><strong>Nome:</strong> {selectedActivity.titulo}</Typography>
+        <Typography><strong>Data:</strong> {selectedActivity.dataAtividade}</Typography>
+      </>
+    )}
+    <Box sx={{ display: 'flex', justifyContent: 'flex-end', mt: 3 }}>
+      <Button
+        variant="outlined"
+        onClick={() => setShowActivityDetailsModal(false)}
+        sx={{
+          color: '#f44336',
+          borderColor: '#f44336',
+          '&:hover': {
+            backgroundColor: 'rgba(244, 67, 54, 0.1)',
+          },
+        }}
+      >
+        Fechar
+      </Button>
+    </Box>
+  </Box>
+</Modal>
+<Modal open={showParticipantDetailsModal} onClose={() => setShowParticipantDetailsModal(false)}>
   <Box
     sx={{
       position: 'absolute',
@@ -1006,10 +1365,12 @@ useEffect(() => {
     {selectedParticipant && (
       <>
         <Typography><strong>Nome:</strong> {selectedParticipant.name}</Typography>
-        <Typography><strong>Email:</strong> {selectedParticipant.email}</Typography>
+        <Typography><strong>E-mail:</strong> {selectedParticipant.email}</Typography>
         <Typography>
-          <strong>Status de Confirmação:</strong>{' '}
-          {selectedParticipant.UserViagem?.confirmada ? 'Confirmado' : 'Não Confirmado'}
+          <strong>Status:</strong>{' '}
+          <span style={{ color: selectedParticipant.UserViagem.confirmada ? '#4caf50' : '#f44336' }}>
+            {selectedParticipant.UserViagem.confirmada ? 'Confirmado' : 'Não Confirmado'}
+          </span>
         </Typography>
       </>
     )}
@@ -1030,8 +1391,86 @@ useEffect(() => {
     </Box>
   </Box>
 </Modal>
+
+<Modal open={openEditActivityModal} onClose={() => setOpenEditActivityModal(false)}>
+  <Box className={classes.modalBox}>
+    <Typography variant="h6" className={classes.modalTitle}>
+      Editar Atividade
+    </Typography>
+
+    <TextField
+      label="Nome da Atividade"
+      name="nome"
+      variant="outlined"
+      fullWidth
+      value={selectedActivity?.titulo || ''}
+      onChange={(e) =>
+        setSelectedActivity((prev) => ({ ...prev, titulo: e.target.value }))
+      }
+      className={classes.modalTextField}
+    />
+
+    <TextField
+      label="Descrição"
+      name="descricao"
+      variant="outlined"
+      fullWidth
+      multiline
+      rows={3}
+      value={selectedActivity?.descricao || ''}
+      onChange={(e) =>
+        setSelectedActivity((prev) => ({ ...prev, descricao: e.target.value }))
+      }
+      className={classes.modalTextField}
+    />
+
+    <TextField
+      label="Data"
+      name="data"
+      type="date"
+      variant="outlined"
+      fullWidth
+      value={selectedActivity?.dataAtividade || ''}
+      onChange={(e) =>
+        setSelectedActivity((prev) => ({ ...prev, dataAtividade: e.target.value }))
+      }
+      className={classes.modalTextField}
+      InputLabelProps={{
+        shrink: true,
+      }}
+    />
+
+    <Box sx={{ display: 'flex', justifyContent: 'flex-end', gap: 2, mt: 3 }}>
+      <Button
+        variant="outlined"
+        onClick={() => setOpenEditActivityModal(false)}
+        sx={{
+          color: '#f44336',
+          borderColor: '#f44336',
+          '&:hover': {
+            backgroundColor: 'rgba(244, 67, 54, 0.1)',
+          },
+        }}
+      >
+        Cancelar
+      </Button>
+      <Button
+        variant="contained"
+        onClick={handleUpdateActivity} // Função para salvar as alterações
+        sx={{
+          backgroundColor: '#4caf50',
+          color: '#fff',
+          '&:hover': {
+            backgroundColor: '#45a049',
+          },
+        }}
+      >
+        Salvar
+      </Button>
+    </Box>
   </Box>
 </Modal>
+
 
     </Box>
   );
