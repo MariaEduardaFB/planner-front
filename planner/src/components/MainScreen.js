@@ -17,17 +17,15 @@ const MainScreen = () => {
         width: '100vw',
         minHeight: '100vh',
         overflow: 'hidden', 
-        paddingTop: '80px', // Espaço para o menu fixo
+        paddingTop: '80px',
       }}
     >
       <Menu />
-      
-      {/* Conteúdo principal com padding para não ficar sob o menu */}
+    
       <div style={{ padding: '20px' }}>
         <Outlet />
       </div>
 
-      {/* Background padrão só para a rota raiz */}
       {window.location.pathname === '/' && (
         <div
           style={{
