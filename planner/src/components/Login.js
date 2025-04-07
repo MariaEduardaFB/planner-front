@@ -9,7 +9,6 @@ import {
   Box,
   CircularProgress,
   ThemeProvider,
-  createTheme,
   CssBaseline,
   Link,
 } from '@mui/material';
@@ -28,20 +27,25 @@ const Login = ({ onLogin }) => {
     e.preventDefault();
     setLoading(true);
     setError('');
-
+  
     try {
-      await login(email, password);
-      onLogin();
+      const { user } = await login(email, password);
+  
+      if (user && user.role) {
+        localStorage.setItem('userType', user.role); // Salva o tipo de usuário
+        onLogin(); // Redireciona para o dashboard
+      } else {
+        setError('Tipo de usuário não encontrado.');
+      }
     } catch (err) {
+      console.error('Erro no login:', err);
       setError('Credenciais inválidas');
     } finally {
       setLoading(false);
     }
   };
 
-  const isEmailValid = () => {
-    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
-  };
+  const isEmailValid = () => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 
   const handleRedirectToSignUp = () => {
     navigate('/signup');
@@ -53,7 +57,7 @@ const Login = ({ onLogin }) => {
       <Box
         sx={{
           minHeight: '100vh',
-          background: 'linear-gradient(135deg, #000000 0%, #0a192f 100%)', // Gradiente preto para azul escuro
+          background: 'linear-gradient(135deg, #000000 0%, #0a192f 100%)',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
@@ -67,27 +71,23 @@ const Login = ({ onLogin }) => {
               display: 'flex',
               flexDirection: 'column',
               alignItems: 'center',
-              background: 'rgba(30, 30, 30, 0.5)', // Fundo semi-transparente
-              backdropFilter: 'blur(10px)', // Efeito de desfoque
-              borderRadius: '15px', // Bordas arredondadas
-              boxShadow: '0 8px 32px 0 rgba(31, 38, 135, 0.37)', // Sombra suave
-              border: '1px solid rgba(255, 255, 255, 0.18)', // Borda sutil
+              background: 'rgba(30, 30, 30, 0.5)',
+              backdropFilter: 'blur(10px)',
+              borderRadius: '15px',
+              boxShadow: '0 8px 32px 0 rgba(31, 38, 135, 0.37)',
+              border: '1px solid rgba(255, 255, 255, 0.18)',
             }}
           >
             <img
               src="/logo.svg"
               alt=""
-              style={{
-                width: '300px',
-                zIndex: -1,
-              }}
+              style={{ width: '300px', zIndex: -1 }}
             />
             <Box
               component="form"
               onSubmit={handleSubmit}
               sx={{ width: '100%' }}
             >
-              {/* Campo de Email */}
               <TextField
                 fullWidth
                 margin="normal"
@@ -106,9 +106,8 @@ const Login = ({ onLogin }) => {
                 sx={{
                   background: 'rgba(255, 255, 255, 0.1)',
                   borderRadius: '5px',
-                }} // Fundo sutil
+                }}
               />
-              {/* Campo de Senha */}
               <TextField
                 fullWidth
                 margin="normal"
@@ -125,15 +124,13 @@ const Login = ({ onLogin }) => {
                 sx={{
                   background: 'rgba(255, 255, 255, 0.1)',
                   borderRadius: '5px',
-                }} // Fundo sutil
+                }}
               />
-              {/* Exibição de Erro */}
               {error && (
                 <Typography color="error" variant="body2" sx={{ mt: 1 }}>
                   {error}
                 </Typography>
               )}
-              {/* Botão de Login */}
               <Button
                 type="submit"
                 fullWidth
@@ -143,19 +140,18 @@ const Login = ({ onLogin }) => {
                   mt: 3,
                   mb: 2,
                   background:
-                    'linear-gradient(135deg, #0a192f 0%, #2575fc 100%)', // Gradiente no botão
+                    'linear-gradient(135deg, #0a192f 0%, #2575fc 100%)',
                   color: 'white',
-                  borderRadius: '8px', // Bordas arredondadas
+                  borderRadius: '8px',
                   '&:hover': {
                     background:
-                      'linear-gradient(135deg, #2575fc 0%, #0a192f 100%)', // Gradiente invertido ao passar o mouse
+                      'linear-gradient(135deg, #2575fc 0%, #0a192f 100%)',
                   },
                 }}
               >
                 {loading ? <CircularProgress size={24} /> : 'Entrar'}
               </Button>
             </Box>
-            {/* Link para a tela de cadastro */}
             <Typography variant="body2" sx={{ mt: 2 }}>
               Não tem uma conta?{' '}
               <Link

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
     Box, Button, TextField, Modal, Typography, Checkbox, FormControlLabel
 } from '@mui/material';
@@ -43,18 +43,40 @@ const darkTheme = createTheme({
   },
 });
 
+const organizador = localStorage.getItem('organizador') || 'Organizador Padrão';
 const ViagemForm = ({ open, onClose, onSubmit, initialData, isEdit }) => {
-    const [formData, setFormData] = useState(initialData || { 
+    const [formData, setFormData] = useState({ 
         dataCriacao: new Date(),
         dataInicio: null,
         dataFinal: null,
-        confirmada: false,
         confirmacao: '',
-        organizador: '',
+        organizador: organizador, // Nome do organizador preenchido automaticamente
         pais: '',
         estado: '',
         cidade: ''
     });
+
+    useEffect(() => {
+        if (initialData) {
+          setFormData({
+            ...initialData,
+            dataCriacao: initialData.dataCriacao ? new Date(initialData.dataCriacao) : new Date(),
+            dataInicio: initialData.dataInicio ? new Date(initialData.dataInicio) : null,
+            dataFinal: initialData.dataFinal ? new Date(initialData.dataFinal) : null,
+          });
+        } else {
+          setFormData({
+            dataCriacao: new Date(),
+            dataInicio: null,
+            dataFinal: null,
+            confirmacao: '',
+            organizador: '',
+            pais: '',
+            estado: '',
+            cidade: ''
+          });
+        }
+      }, [initialData]);
 
     const handleChange = (e) => {
         const { name, value, type, checked } = e.target;
@@ -72,6 +94,7 @@ const ViagemForm = ({ open, onClose, onSubmit, initialData, isEdit }) => {
     };
 
     const handleSubmit = () => {
+        console.log("Dados enviados para onSubmit:", formData);
         onSubmit(formData);
         onClose();
     };
@@ -102,7 +125,7 @@ const ViagemForm = ({ open, onClose, onSubmit, initialData, isEdit }) => {
                             borderBottom: '1px solid rgba(100, 255, 218, 0.2)',
                             pb: 1
                         }}>
-                            {isEdit ? 'Editar Evento' : 'Criar Novo Evento'}
+                            {isEdit ? 'Editar Viagem' : 'Criar Viagem'}
                         </Typography>
                         
                         <DatePicker
@@ -160,59 +183,8 @@ const ViagemForm = ({ open, onClose, onSubmit, initialData, isEdit }) => {
                             )}
                         />
                         
-                        <FormControlLabel
-                            control={
-                                <Checkbox
-                                    name="confirmada"
-                                    checked={formData.confirmada}
-                                    onChange={handleChange}
-                                    sx={{
-                                        color: '#64ffda',
-                                        '&.Mui-checked': {
-                                            color: '#64ffda',
-                                        },
-                                    }}
-                                />
-                            }
-                            label="Confirmada"
-                            sx={{ 
-                                mb: 3,
-                                color: '#e6f1ff',
-                                '& .MuiTypography-root': {
-                                    fontSize: '0.875rem',
-                                }
-                            }}
-                        />
                         
-                        <TextField
-                            label="Confirmação"
-                            name="confirmacao"
-                            variant="outlined"
-                            fullWidth
-                            value={formData.confirmacao}
-                            onChange={handleChange}
-                            sx={{ 
-                                mb: 3,
-                                '& .MuiInputLabel-root': {
-                                    color: '#8892b0',
-                                },
-                            }}
-                        />
                         
-                        <TextField
-                            label="Organizador"
-                            name="organizador"
-                            variant="outlined"
-                            fullWidth
-                            value={formData.organizador}
-                            onChange={handleChange}
-                            sx={{ 
-                                mb: 3,
-                                '& .MuiInputLabel-root': {
-                                    color: '#8892b0',
-                                },
-                            }}
-                        />
                         
                         <TextField
                             label="País"
@@ -262,8 +234,6 @@ const ViagemForm = ({ open, onClose, onSubmit, initialData, isEdit }) => {
                             }}
                         />
 
-                        
-                        
                         <Button 
                             variant="contained" 
                             onClick={handleSubmit}

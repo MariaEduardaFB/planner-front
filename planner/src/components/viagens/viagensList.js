@@ -156,7 +156,7 @@ const ViagensList = () => {
 
   const fetchViagens = async () => {
     try {
-      const response = await api.get(`/viagens`);
+      const response = await api.get('/viagens');
       setViagens(response.data.viagens);
     } catch (error) {
       console.error("Erro ao buscar viagens:", error);
@@ -198,11 +198,15 @@ const ViagensList = () => {
     }
   };
 
-  const handleUpdateViagem = async () => {
+  const handleUpdateViagem = async (formData) => {
     try {
-      await api.put(`viagem/${currentViagem.id}`, currentViagem);
-      setOpenEditModal(false);
-      fetchViagens();
+      await api.put(`/viagem/${formData.id}`, formData);
+      setViagens((prevViagens) =>
+        prevViagens.map((viagem) =>
+          viagem.id === formData.id ? { ...viagem, ...formData } : viagem
+        )
+      );
+      setOpenCreateModal(false);
     } catch (error) {
       console.error("Erro ao atualizar viagem:", error);
     }
