@@ -36,17 +36,37 @@ const ActivityModal = ({ open, onClose, viagem, activity: initialActivity = null
     try {
       const formattedActivity = {
         ...activity,
-        dataAtividade: activity.dataAtividade ? activity.dataAtividade.toISOString() : null,
+        dataAtividade: activity.dataAtividade
+          ? new Date(activity.dataAtividade).toISOString() // Certifique-se de que é um objeto Date válido
+          : null,
       };
-
+  
+      console.log('Dados enviados:', formattedActivity);
+  
+      let response;
       if (isEditing) {
-        const response = await api.put(`/atividade/${activity.id}`, formattedActivity);
-        onActivityUpdated(response.data);
+        response = await api.put(`/atividade/${activity.id}`, formattedActivity);
       } else {
-        const response = await api.post('/atividade', formattedActivity);
-        onActivityUpdated(response.data);
+        response = await api.post('/atividade', formattedActivity);
       }
-
+  
+      const savedActivity = response.data;
+  
+      // Verifique se a data retornada é válida antes de convertê-la
+      if (savedActivity.atividade?.dataAtividade) {
+        if (!isNaN(new Date(savedActivity.atividade.dataAtividade).getTime())) {
+          savedActivity.atividade.dataAtividade = new Date(savedActivity.atividade.dataAtividade);
+        } else {
+          console.warn('Data inválida recebida do backend:', savedActivity.atividade.dataAtividade);
+          savedActivity.atividade.dataAtividade = null; // Ou defina um valor padrão
+        }
+      } else {
+        console.warn('Campo dataAtividade não retornado pelo backend.');
+        savedActivity.atividade.dataAtividade = null; // Ou defina um valor padrão
+      }
+  
+      onActivityUpdated(savedActivity.atividade);
+  
       onClose();
     } catch (error) {
       console.error('Erro ao salvar atividade:', error);
@@ -59,7 +79,11 @@ const ActivityModal = ({ open, onClose, viagem, activity: initialActivity = null
   };
 
   const handleDateChange = (value) => {
-    setActivity((prev) => ({ ...prev, dataAtividade: value }));
+    if (value) {
+      setActivity((prev) => ({ ...prev, dataAtividade: value })); // Use o valor diretamente
+    } else {
+      setActivity((prev) => ({ ...prev, dataAtividade: null }));
+    }
   };
 
   return (
@@ -72,10 +96,12 @@ const ActivityModal = ({ open, onClose, viagem, activity: initialActivity = null
             left: '50%',
             transform: 'translate(-50%, -50%)',
             width: 400,
-            bgcolor: 'background.paper',
+            bgcolor: '#0a192f', // Cor de fundo do modal (alterada para um tom escuro)
+            color: '#ffffff', // Cor do texto no modal
             boxShadow: 24,
             p: 4,
             borderRadius: '12px',
+            border: '1px solid rgba(255, 255, 255, 0.2)', // Borda sutil para destacar o modal
           }}
         >
           <Typography variant="h6" mb={2}>
@@ -83,20 +109,58 @@ const ActivityModal = ({ open, onClose, viagem, activity: initialActivity = null
           </Typography>
 
           <DatePicker
-            label="Data da Atividade"
-            value={activity.dataAtividade}
-            onChange={handleDateChange}
-            renderInput={(params) => <TextField {...params} fullWidth sx={{ mb: 3 }} />}
-          />
+  label="Data da Atividade"
+  value={activity.dataAtividade}
+  onChange={handleDateChange}
+  renderInput={(params) => (
+    <TextField
+      {...params}
+      fullWidth
+      sx={{
+        mb: 3,
+        '& .MuiOutlinedInput-root': {
+          '& fieldset': {
+            borderColor: '#ffffff',
+          },
+          '&:hover fieldset': {
+            borderColor: '#64ffda',
+          },
+          '&.Mui-focused fieldset': {
+            borderColor: '#64ffda',
+          },
+        },
+      }}
+    />
+  )}
+/>
 
-          <TextField
-            label="Título"
-            name="titulo"
-            fullWidth
-            value={activity.titulo}
-            onChange={handleChange}
-            sx={{ mb: 3 }}
-          />
+<TextField
+  label="Título"
+  name="titulo"
+  fullWidth
+  value={activity.titulo}
+  onChange={handleChange}
+  sx={{
+    mb: 3,
+    '& .MuiInputBase-input': {
+      color: '#ffffff', // Cor do texto do input
+    },
+    '& .MuiInputLabel-root': {
+      color: '#ffffff', // Cor do rótulo (label)
+    },
+    '& .MuiOutlinedInput-root': {
+      '& fieldset': {
+        borderColor: '#ffffff', // Cor da borda
+      },
+      '&:hover fieldset': {
+        borderColor: '#64ffda', // Cor da borda ao passar o mouse
+      },
+      '&.Mui-focused fieldset': {
+        borderColor: '#64ffda', // Cor da borda ao focar
+      },
+    },
+  }}
+/>
 
           <Box sx={{ display: 'flex', justifyContent: 'flex-end' }}>
             <Button variant="contained" onClick={handleSave} sx={{ mr: 2 }}>

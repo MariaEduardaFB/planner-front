@@ -160,9 +160,9 @@ const ViagemDetailsModal = ({ open, onClose, viagem, userType }) => {
         <List>
   {atividades.map((a) => (
     <ListItem
-      key={a.id}
+      key={a.id} // Certifique-se de que "a.id" é único
       secondaryAction={
-        userType === 'organizador' && ( // Verifica se o usuário é organizador
+        userType === 'organizador' && (
           <>
             <IconButton onClick={() => handleEditActivity(a)}>
               <Edit />
@@ -175,13 +175,13 @@ const ViagemDetailsModal = ({ open, onClose, viagem, userType }) => {
       }
     >
       <ListItemText
-        primary={a.titulo}
-        secondary={
-          <Typography variant="body2" sx={{ color: '#d3d3d3' }}>
-            Data: {new Date(a.dataAtividade).toLocaleDateString()}
-          </Typography>
-        }
-      />
+  primary={a.titulo}
+  secondary={
+    <Typography variant="body2" sx={{ color: '#d3d3d3' }}>
+      Data: {a.dataAtividade ? new Date(a.dataAtividade).toLocaleDateString() : 'Data inválida'}
+    </Typography>
+  }
+/>
     </ListItem>
   ))}
 </List>
@@ -228,16 +228,6 @@ const ViagemDetailsModal = ({ open, onClose, viagem, userType }) => {
   );
 };
 
-const modalStyle = {
-  position: 'absolute',
-  top: '50%',
-  left: '50%',
-  transform: 'translate(-50%, -50%)',
-  width: 400,
-  bgcolor: 'background.paper',
-  boxShadow: 24,
-  p: 4,
-  borderRadius: '12px',
-};
+
 
 export default ViagemDetailsModal;
