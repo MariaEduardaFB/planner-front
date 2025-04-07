@@ -28,8 +28,7 @@ const ViagensList = () => {
   const [openAddActivityModal, setOpenAddActivityModal] = useState(false);
   const [selectedViagem, setSelectedViagem] = useState(null);
 
-  // 👉 Aqui você define o tipo do usuário manualmente por enquanto
-  const userType = localStorage.getItem('userType') || 'convidado'; // Valor padrão: 'convidado'
+  const userType = localStorage.getItem('userType') || 'convidado';
 
   const handleAddActivityClick = (viagem) => {
     setSelectedViagem(viagem);
@@ -94,7 +93,6 @@ const ViagensList = () => {
       const response = await api.post(`/viagens/${viagem.id}/confirmar`);
       const mensagem = response.data.message;
   
-      // Atualiza o estado local para refletir a confirmação
       setViagens((prevViagens) =>
         prevViagens.map((v) =>
           v.id === viagem.id ? { ...v, confirmada: true } : v
@@ -114,10 +112,10 @@ const ViagensList = () => {
       <Box
         sx={{
           display: 'flex',
-          flexDirection: 'column', // Organiza o botão e a tabela em coluna
-          alignItems: 'flex-end', // Alinha o botão à direita
+          flexDirection: 'column',
+          alignItems: 'flex-end',
           mb: 2, 
-          marginRight: 18,// Margem inferior para separar o botão da tabela
+          marginRight: 18,
         }}
       >
         <Button
@@ -132,7 +130,7 @@ const ViagensList = () => {
             color: 'white',
             borderRadius: '8px',
             textTransform: 'none',
-            mb: 2, // Margem inferior para separar o botão da tabela
+            mb: 2,
             '&:hover': {
               background: 'linear-gradient(135deg, #2575fc 0%, #0a192f 100%)',
             },
@@ -191,18 +189,18 @@ const ViagensList = () => {
         participant={selectedParticipant || {}}
       />
 
-<ActivityModal
-  open={openActivityModal}
-  onClose={() => setOpenActivityModal(false)}
-  viagem={currentViagem} // Substituído "viagem" por "currentViagem"
-  activity={selectedActivity}
-  onActivityUpdated={(novaOuAtualizada) => {
-    if (novaOuAtualizada.dataAtividade && !isNaN(new Date(novaOuAtualizada.dataAtividade).getTime())) {
-      novaOuAtualizada.dataAtividade = new Date(novaOuAtualizada.dataAtividade);
-    } else {
-      console.warn('Data inválida recebida do backend:', novaOuAtualizada.dataAtividade);
-      novaOuAtualizada.dataAtividade = null; // Ou defina um valor padrão
-    }
+      <ActivityModal
+        open={openActivityModal}
+        onClose={() => setOpenActivityModal(false)}
+        viagem={currentViagem}
+        activity={selectedActivity}
+        onActivityUpdated={(novaOuAtualizada) => {
+          if (novaOuAtualizada.dataAtividade && !isNaN(new Date(novaOuAtualizada.dataAtividade).getTime())) {
+            novaOuAtualizada.dataAtividade = new Date(novaOuAtualizada.dataAtividade);
+          } else {
+            console.warn('Data inválida recebida do backend:', novaOuAtualizada.dataAtividade);
+            novaOuAtualizada.dataAtividade = null;
+          }
 
     setAtividades((prev) => {
       const exists = prev.find((a) => a.id === novaOuAtualizada.id);
