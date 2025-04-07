@@ -21,20 +21,19 @@ import { Email, Lock, Person } from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
 import api from '../services/api';
 
-// Tema escuro personalizado
 const darkTheme = createTheme({
   palette: {
     mode: 'dark',
     primary: {
-      main: '#90caf9', // Azul claro
+      main: '#90caf9', 
     },
     background: {
-      default: '#121212', // Fundo escuro
-      paper: 'rgba(30, 30, 30, 0.5)', // Transparência no cartão
+      default: '#121212', 
+      paper: 'rgba(30, 30, 30, 0.5)', 
     },
     text: {
-      primary: '#ffffff', // Texto branco
-      secondary: '#b3b3b3', // Texto cinza
+      primary: '#ffffff', 
+      secondary: '#b3b3b3', 
     },
   },
 });
@@ -44,7 +43,7 @@ const SignUp = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
-  const [role, setRole] = useState(''); // Adicionando o estado para o papel
+  const [role, setRole] = useState(''); 
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
   const [loading, setLoading] = useState(false);
@@ -75,7 +74,6 @@ const SignUp = () => {
     }
 
     try {
-      // Simulação de cadastro
       console.log('Cadastro realizado:', { name, email, password });
       const response = await api.post('/auth/signup', { name, email, password, role });
       setSuccess(true);
@@ -96,7 +94,7 @@ const SignUp = () => {
       <Box
         sx={{
           minHeight: '100vh',
-          background: 'linear-gradient(135deg, #000000 0%, #0a192f 100%)', // Gradiente preto para azul escuro
+          background: 'linear-gradient(135deg, #000000 0%, #0a192f 100%)', 
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
@@ -110,11 +108,11 @@ const SignUp = () => {
               display: 'flex',
               flexDirection: 'column',
               alignItems: 'center',
-              background: 'rgba(30, 30, 30, 0.5)', // Fundo semi-transparente
-              backdropFilter: 'blur(10px)', // Efeito de desfoque
-              borderRadius: '15px', // Bordas arredondadas
-              boxShadow: '0 8px 32px 0 rgba(31, 38, 135, 0.37)', // Sombra suave
-              border: '1px solid rgba(255, 255, 255, 0.18)', // Borda sutil
+              background: 'rgba(30, 30, 30, 0.5)', 
+              backdropFilter: 'blur(10px)', 
+              borderRadius: '15px', 
+              boxShadow: '0 8px 32px 0 rgba(31, 38, 135, 0.37)', 
+              border: '1px solid rgba(255, 255, 255, 0.18)', 
             }}
           >
             <img
@@ -133,7 +131,7 @@ const SignUp = () => {
               onSubmit={handleSubmit}
               sx={{ width: '100%' }}
             >
-              {/* Campo de Nome */}
+              
               <TextField
                 fullWidth
                 margin="normal"
@@ -150,9 +148,9 @@ const SignUp = () => {
                 sx={{
                   background: 'rgba(255, 255, 255, 0.1)',
                   borderRadius: '5px',
-                }} // Fundo sutil
+                }} 
               />
-              {/* Campo de Email */}
+            
               <TextField
                 fullWidth
                 margin="normal"
@@ -175,9 +173,9 @@ const SignUp = () => {
                 sx={{
                   background: 'rgba(255, 255, 255, 0.1)',
                   borderRadius: '5px',
-                }} // Fundo sutil
+                }} 
               />
-              {/* Campo de Senha */}
+                
               <TextField
                 fullWidth
                 margin="normal"
@@ -194,9 +192,9 @@ const SignUp = () => {
                 sx={{
                   background: 'rgba(255, 255, 255, 0.1)',
                   borderRadius: '5px',
-                }} // Fundo sutil
+                }} 
               />
-              {/* Campo de Confirmação de Senha */}
+                
               <TextField
                 fullWidth
                 margin="normal"
@@ -213,7 +211,7 @@ const SignUp = () => {
                 sx={{
                   background: 'rgba(255, 255, 255, 0.1)',
                   borderRadius: '5px',
-                }} // Fundo sutil
+                }} 
               />
               <FormControl fullWidth margin="normal">
                 <InputLabel id="role-label">Função</InputLabel>
@@ -231,25 +229,25 @@ const SignUp = () => {
                   <MenuItem value="convidado">Convidado</MenuItem>
                 </Select>
               </FormControl>
-              {/* Exibição de Erro */}
+
               {error && (
                 <Typography color="error" variant="body2" sx={{ mt: 1 }}>
                   {error}
                 </Typography>
               )}
-              {/* Exibição de Erro */}
+
               {error && (
                 <Typography color="error" variant="body2" sx={{ mt: 1 }}>
                   {error}
                 </Typography>
               )}
-               {/* Exibição de Sucesso */}
+
                {success && (
                 <Alert severity="success" sx={{ mt: 2 }}>
                   Cadastro realizado com sucesso!
                 </Alert>
               )}
-              {/* Botão de Cadastro */}
+                
               <Button
                 type="submit"
                 fullWidth
@@ -260,19 +258,19 @@ const SignUp = () => {
                   mt: 3,
                   mb: 2,
                   background:
-                    'linear-gradient(135deg, #0a192f 0%, #2575fc 100%)', // Gradiente no botão
+                    'linear-gradient(135deg, #0a192f 0%, #2575fc 100%)', 
                   color: 'white',
-                  borderRadius: '8px', // Bordas arredondadas
+                  borderRadius: '8px', 
                   '&:hover': {
                     background:
-                      'linear-gradient(135deg, #2575fc 0%, #0a192f 100%)', // Gradiente invertido ao passar o mouse
+                      'linear-gradient(135deg, #2575fc 0%, #0a192f 100%)', 
                   },
                 }}
               >
                 {loading ? <CircularProgress size={24} /> : 'Cadastrar'}
               </Button>
             </Box>
-            {/* Link para a tela de login */}
+                
             <Typography variant="body2" sx={{ mt: 2 }}>
               Já tem uma conta?{' '}
               <Link
