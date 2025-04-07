@@ -2,8 +2,8 @@ import React, { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 
 const menuItems = [
-  { label: 'Inicio', path: '/' }, // Rota para Tela Inicial
-  { label: 'Viagem', path: '/viagens' }, // Rota para Viagens
+  { label: 'Inicio', path: '/' },
+  { label: 'Viagem', path: '/viagens' },
 ];
 
 const MenuItem = ({ label, path, currentPath }) => {
@@ -23,7 +23,7 @@ const MenuItem = ({ label, path, currentPath }) => {
       <Link
         to={path}
         style={{
-          color: hover ? '#3965A5' : '#fff', // Muda a cor do texto no hover
+          color: hover ? '#3965A5' : '#fff',
           textDecoration: 'none',
           cursor: 'pointer',
           fontWeight: isActive ? 'bold' : 'normal',
