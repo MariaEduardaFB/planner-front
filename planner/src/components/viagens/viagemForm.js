@@ -50,7 +50,7 @@ const ViagemForm = ({ open, onClose, onSubmit, initialData, isEdit }) => {
         dataInicio: null,
         dataFinal: null,
         confirmacao: '',
-        organizador: organizador, // Nome do organizador preenchido automaticamente
+        organizador: organizador,
         pais: '',
         estado: '',
         cidade: ''
@@ -182,9 +182,6 @@ const ViagemForm = ({ open, onClose, onSubmit, initialData, isEdit }) => {
                                 />
                             )}
                         />
-                        
-                        
-                        
                         
                         <TextField
                             label="País"
