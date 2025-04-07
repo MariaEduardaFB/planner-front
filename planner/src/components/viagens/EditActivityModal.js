@@ -23,8 +23,8 @@ const EditActivityModal = ({ open, onClose, activity, onSave }) => {
   };
 
   const handleSubmit = () => {
-    onSave({ ...activity, ...formData }); // Chama a função de salvar com os dados atualizados
-    onClose(); // Fecha o modal
+    onSave({ ...activity, ...formData });
+    onClose();
   };
 
   return (
