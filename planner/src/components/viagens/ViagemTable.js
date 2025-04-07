@@ -36,12 +36,10 @@ const ViagemTable = ({ viagens, onEdit, onDetails, onAddParticipant, onDelete, o
               <TableCell sx={{ color: '#ffffff' }}>{viagem.estado}</TableCell>
               <TableCell sx={{ color: '#ffffff' }}>{viagem.cidade}</TableCell>
               <TableCell>
-                {/* Todos podem ver os detalhes */}
                 <IconButton onClick={() => onDetails(viagem)}>
                   <Info sx={{ color: '	#87CEFA' }} />
                 </IconButton>
 
-                {/* Apenas organizadores podem editar, excluir e adicionar participantes */}
                 {userType === 'organizador' && (
                   <>
                     <IconButton onClick={() => onEdit(viagem)}>
@@ -56,7 +54,6 @@ const ViagemTable = ({ viagens, onEdit, onDetails, onAddParticipant, onDelete, o
                   </>
                 )}
 
-                {/* Apenas convidados (participantes) podem confirmar presença */}
                 {userType === 'convidado' && (
                   <IconButton onClick={() => onConfirm(viagem)}>
                     ✅
