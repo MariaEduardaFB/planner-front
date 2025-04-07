@@ -37,7 +37,7 @@ const ActivityModal = ({ open, onClose, viagem, activity: initialActivity = null
       const formattedActivity = {
         ...activity,
         dataAtividade: activity.dataAtividade
-          ? new Date(activity.dataAtividade).toISOString() // Certifique-se de que é um objeto Date válido
+          ? new Date(activity.dataAtividade).toISOString()
           : null,
       };
   
@@ -52,17 +52,16 @@ const ActivityModal = ({ open, onClose, viagem, activity: initialActivity = null
   
       const savedActivity = response.data;
   
-      // Verifique se a data retornada é válida antes de convertê-la
       if (savedActivity.atividade?.dataAtividade) {
         if (!isNaN(new Date(savedActivity.atividade.dataAtividade).getTime())) {
           savedActivity.atividade.dataAtividade = new Date(savedActivity.atividade.dataAtividade);
         } else {
           console.warn('Data inválida recebida do backend:', savedActivity.atividade.dataAtividade);
-          savedActivity.atividade.dataAtividade = null; // Ou defina um valor padrão
+          savedActivity.atividade.dataAtividade = null;
         }
       } else {
         console.warn('Campo dataAtividade não retornado pelo backend.');
-        savedActivity.atividade.dataAtividade = null; // Ou defina um valor padrão
+        savedActivity.atividade.dataAtividade = null;
       }
   
       onActivityUpdated(savedActivity.atividade);
@@ -80,7 +79,7 @@ const ActivityModal = ({ open, onClose, viagem, activity: initialActivity = null
 
   const handleDateChange = (value) => {
     if (value) {
-      setActivity((prev) => ({ ...prev, dataAtividade: value })); // Use o valor diretamente
+      setActivity((prev) => ({ ...prev, dataAtividade: value }));
     } else {
       setActivity((prev) => ({ ...prev, dataAtividade: null }));
     }
@@ -96,12 +95,12 @@ const ActivityModal = ({ open, onClose, viagem, activity: initialActivity = null
             left: '50%',
             transform: 'translate(-50%, -50%)',
             width: 400,
-            bgcolor: '#0a192f', // Cor de fundo do modal (alterada para um tom escuro)
-            color: '#ffffff', // Cor do texto no modal
+            bgcolor: '#0a192f',
+            color: '#ffffff',
             boxShadow: 24,
             p: 4,
             borderRadius: '12px',
-            border: '1px solid rgba(255, 255, 255, 0.2)', // Borda sutil para destacar o modal
+            border: '1px solid rgba(255, 255, 255, 0.2)',
           }}
         >
           <Typography variant="h6" mb={2}>
@@ -143,20 +142,20 @@ const ActivityModal = ({ open, onClose, viagem, activity: initialActivity = null
   sx={{
     mb: 3,
     '& .MuiInputBase-input': {
-      color: '#ffffff', // Cor do texto do input
+      color: '#ffffff',
     },
     '& .MuiInputLabel-root': {
-      color: '#ffffff', // Cor do rótulo (label)
+      color: '#ffffff',
     },
     '& .MuiOutlinedInput-root': {
       '& fieldset': {
-        borderColor: '#ffffff', // Cor da borda
+        borderColor: '#ffffff',
       },
       '&:hover fieldset': {
-        borderColor: '#64ffda', // Cor da borda ao passar o mouse
+        borderColor: '#64ffda',
       },
       '&.Mui-focused fieldset': {
-        borderColor: '#64ffda', // Cor da borda ao focar
+        borderColor: '#64ffda',
       },
     },
   }}
