@@ -32,8 +32,8 @@ const Login = ({ onLogin }) => {
       const { user } = await login(email, password);
   
       if (user && user.role) {
-        localStorage.setItem('userType', user.role); // Salva o tipo de usuário
-        onLogin(); // Redireciona para o dashboard
+        localStorage.setItem('userType', user.role);
+        onLogin(); 
       } else {
         setError('Tipo de usuário não encontrado.');
       }
