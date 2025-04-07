@@ -27,9 +27,9 @@ const AddParticipantModal = ({ open, onClose, viagem, onParticipantAdded }) => {
       await api.post(`/user-viagem/${viagem.id}`, { email });
       setInviteSuccess('Participante adicionado com sucesso!');
       setInviteError('');
-      setEmail(''); // Limpa o campo de e-mail
-      onParticipantAdded(); // Atualiza a lista de participantes
-      onClose(); // Fecha o modal
+      setEmail('');
+      onParticipantAdded();
+      onClose();
     } catch (error) {
       console.error('Erro ao convidar participante:', error);
       setInviteError(error.response?.data?.message || 'Erro ao convidar participante.');
@@ -46,12 +46,12 @@ const AddParticipantModal = ({ open, onClose, viagem, onParticipantAdded }) => {
             left: '50%',
             transform: 'translate(-50%, -50%)',
             width: 400,
-            bgcolor: '#0a192f', // Cor de fundo do modal (alterada para um tom escuro)
-            color: '#ffffff', // Cor do texto no modal
+            bgcolor: '#0a192f',
+            color: '#ffffff',
             boxShadow: 24,
             p: 4,
             borderRadius: '12px',
-            border: '1px solid rgba(255, 255, 255, 0.2)', // Borda sutil para destacar o modal
+            border: '1px solid rgba(255, 255, 255, 0.2)',
           }}
       >
         <Typography variant="h6" mb={2}>
@@ -65,20 +65,20 @@ const AddParticipantModal = ({ open, onClose, viagem, onParticipantAdded }) => {
           sx={{
             mb: 3,
             '& .MuiInputBase-input': {
-              color: '#ffffff', // Cor do texto do input
+              color: '#ffffff',
             },
             '& .MuiInputLabel-root': {
-              color: '#ffffff', // Cor do rótulo (label)
+              color: '#ffffff',
             },
             '& .MuiOutlinedInput-root': {
               '& fieldset': {
-                borderColor: '#ffffff', // Cor da borda
+                borderColor: '#ffffff',
               },
               '&:hover fieldset': {
-                borderColor: '#64ffda', // Cor da borda ao passar o mouse
+                borderColor: '#64ffda',
               },
               '&.Mui-focused fieldset': {
-                borderColor: '#64ffda', // Cor da borda ao focar
+                borderColor: '#64ffda',
               },
             },
           }}
