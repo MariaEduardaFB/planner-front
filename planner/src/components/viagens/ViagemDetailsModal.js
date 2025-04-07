@@ -23,7 +23,7 @@ const ViagemDetailsModal = ({ open, onClose, viagem, userType }) => {
   const [selectedParticipant, setSelectedParticipant] = useState(null);
 
   const [openActivityModal, setOpenActivityModal] = useState(false);
-  const [selectedActivity, setSelectedActivity] = useState(null); // null = criar nova
+  const [selectedActivity, setSelectedActivity] = useState(null);
 
   useEffect(() => {
     if (viagem?.id) {
@@ -84,15 +84,14 @@ const ViagemDetailsModal = ({ open, onClose, viagem, userType }) => {
     left: '50%',
     transform: 'translate(-50%, -50%)',
     width: 400,
-    bgcolor: '#0a192f', // Cor de fundo do modal
-    color: '#ffffff', // Cor da fonte
+    bgcolor: '#0a192f',
+    color: '#ffffff',
     boxShadow: 24,
     p: 4,
     borderRadius: '12px',
-    border: '1px solid rgba(255, 255, 255, 0.2)', // Borda sutil para destacar o modal
+    border: '1px solid rgba(255, 255, 255, 0.2)',
   };
 
-  // Fallback se nenhuma viagem estiver selecionada
   if (!viagem) {
     return (
       <Modal open={open} onClose={onClose}>
@@ -160,7 +159,7 @@ const ViagemDetailsModal = ({ open, onClose, viagem, userType }) => {
         <List>
   {atividades.map((a) => (
     <ListItem
-      key={a.id} // Certifique-se de que "a.id" é único
+      key={a.id}
       secondaryAction={
         userType === 'organizador' && (
           <>
