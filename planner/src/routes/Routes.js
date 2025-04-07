@@ -78,7 +78,6 @@ const AppRoutes = ({ isAuthenticated, setAuthenticated }) => {
         >
           <Route index element={<div>Página Inicial</div>} />
           <Route path="viagens" element={<ViagensList />} />
-          {/* Outras rotas podem ser adicionadas aqui */}
         </Route>
 
         <Route
